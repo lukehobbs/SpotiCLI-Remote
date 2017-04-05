@@ -10,6 +10,10 @@ SpotifyCNCT will be a command line interface, written in go, that controls media
 - Seek options (fast forward, rewind)
 - Control device selection
 
+## Stretch Goals
+
+- Daemon to monitor currently playing media in plain text for scripting purposes (polybar, conky, etc.)
+
 # Commands
 
 `devices` - list available devices
@@ -38,7 +42,4 @@ SpotifyCNCT will be a command line interface, written in go, that controls media
 `set shuffle (on/off)` - toggle shuffle mode
 
 
-## Stretch Goals
-
-- Daemon to monitor currently playing media in plain text for scripting purposes (polybar, conky, etc.)
 
