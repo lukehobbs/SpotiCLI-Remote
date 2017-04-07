@@ -4,13 +4,13 @@ SpotifyCNCT will be a command line interface, written in go, that controls media
 
 ## Todo
 
-- ---Control media playback (pause/play, next/previous song)---
-- ---Login to Spotify through WebAPI ---
-- ---Store OAuth 2 Token in user's home directory to avoid having to login every run---
+- ~~Control media playback (pause/play, next/previous song)~~
+- ~~Login to Spotify through WebAPI ~~
+- ~~Store OAuth 2 Token in user's home directory to avoid having to login every run~~
 - Control volume of media playback
 - Change options (shuffle/repeat)
 - Seek options (fast forward, rewind)
-- ---Control device selection---
+- ~~Control device selection~~
 
 ## Stretch Goals
 
