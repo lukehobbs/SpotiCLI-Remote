@@ -1,6 +1,6 @@
 # SpotifyCNCT - Spotify Connect CLI Remote
 
-SpotifyCNCT will be a command line interface, written in go, that controls media playback over spotify connected devices using the [Spotify Web API](https://api.spotify.com).
+SpotifyCNCT is a WIP command line interface, written in go, that controls media playback over spotify connected devices using the [Spotify Web API](https://api.spotify.com).
 
 ## Todo
 
