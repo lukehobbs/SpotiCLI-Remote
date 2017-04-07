@@ -1,45 +1,27 @@
 # SpotifyCNCT - Spotify Connect CLI Remote
 
-SpotifyCNCT will be a command line interface, written in go, that controls media playback over spotify connected devices using the [Spotify Web API](https://api.spotify.com). 
+SpotifyCNCT will be a command line interface, written in go, that controls media playback over spotify connected devices using the [Spotify Web API](https://api.spotify.com).
 
-## Goals
+## Todo
 
-- Control media playback (pause/play, next/previous song)
+- ---Control media playback (pause/play, next/previous song)---
+- ---Login to Spotify through WebAPI ---
+- ---Store OAuth 2 Token in user's home directory to avoid having to login every run---
 - Control volume of media playback
 - Change options (shuffle/repeat)
 - Seek options (fast forward, rewind)
-- Control device selection
+- ---Control device selection---
 
 ## Stretch Goals
 
 - Daemon to monitor currently playing media in plain text for scripting purposes (polybar, conky, etc.)
 
-# Commands
+# Currently Implemented Commands
 
-`devices` - list available devices
+Syntax: spotify> [command] [arguments..]
 
-`devices connect $DEVICE` - connect to a device for playback
+`devices`, `d` - list available devices and their IDs
 
+`play DEVICE_ID`, `p DEVICE_ID` - start/resume playback on specified device or currently playing device in none specified
 
-`play` - start/resume playback
- 
-`pause` - pause playback
-
-`next` - skip playback to next track
-
-`prev` - skip playback to previous track
-
-`ff $VALUE` - seek forward to value in track or default if none provided
-
-`rw $VALUE` - seek backward to value in track or default if none provided
-
-`vol (up/down)` - increase/decrease volume of playback
-
-`now` - get information about currently playing track
-
-`set repeat (on/off)` - toggle repeat mode
-
-`set shuffle (on/off)` - toggle shuffle mode
-
-
-
+`pause` - pause playback on currently playing device
