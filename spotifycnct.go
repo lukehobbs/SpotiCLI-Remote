@@ -86,12 +86,12 @@ func main() {
 	app.Usage = "Control Spotify Connect enabled devices via terminal."
 	app.UsageText = "command [command options] [arguments...]"
 
-	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:  "c, config",
-			Usage: "Load configuration from `FILE`",
-		},
-	}
+	// app.Flags = []cli.Flag{
+	// 	cli.StringFlag{
+	// 		Name:  "c, config",
+	// 		Usage: "Load configuration from `FILE`",
+	// 	},
+	// }
 
 	app.Commands = []cli.Command{
 		{
@@ -134,12 +134,19 @@ func main() {
 }
 
 func listDevices() {
-  client := auth.NewClient(tok)
-  devices, err := client.PlayerDevices()
-  if err != nil {
-    panic(err)
-  }
-  fmt.Println("Available devices: ", devices)
+	client := auth.NewClient(tok)
+	devices, err := client.PlayerDevices()
+	if err != nil {
+		panic(err)
+	}
+	for i, v := range devices {
+		fmt.Printf("[%d]=%v (%v)", i+1, v.Name, v.Type)
+		if v.Active == true {
+			fmt.Printf(" ACTIVE\n")
+		} else {
+			fmt.Printf("\n")
+		}
+	}
 }
 
 func completeAuth(w http.ResponseWriter, r *http.Request) {
