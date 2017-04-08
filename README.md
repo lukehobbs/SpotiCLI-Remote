@@ -33,22 +33,24 @@ Syntax: spotify> [command] [--flags] [values...]
 
 # Example
 
-`spotify> devices`
-`[1]=Samsung (TV)`
-`[2]=Desktop (Computer) ACTIVE`
-`[3]=Amazon Echo (Speaker)`
+```
+spotify> devices
+[1]=Samsung (TV)
+[2]=Desktop (Computer) ACTIVE
+[3]=Amazon Echo (Speaker)
 
-`spotify> play --device 3`
+spotify> play --device 3
 
-`spotify> devices`
-`[1]=Samsung (TV)`
-`[2]=Desktop (Computer)`
-`[3]=Amazon Echo (Speaker) ACTIVE`
+spotify> devices
+[1]=Samsung (TV)
+[2]=Desktop (Computer)
+[3]=Amazon Echo (Speaker) ACTIVE
 
-`spotify> vol --set 80`
-`spotify> vol`
-`Volume: 80`
+spotify> vol --set 80
+spotify> vol
+Volume: 80
 
-`spotify> vol --up`
-`spotify> vol`
-`Volume: 90`
+spotify> vol --up
+spotify> vol
+Volume: 90
+```
