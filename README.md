@@ -26,9 +26,11 @@ Syntax: spotify> [command] [--flags] [values...]
 
 `devices`, `d` - list available devices and their IDs
 
-`play [--device]`, `p [-d]` - start/resume playback on specified device or currently playing device in none specified
+`play [--device]`, `p [-d]` - start/resume playback on specified device or active device in none specified
 
-`pause` - pause playback on currently playing device
+`pause`, `pp` - pause playback on active device
+
+`vol [--set, --up, --down]`, `v [--set, --up, --down]` - control volume on active device
 
 
 ## Example Usage
