@@ -30,7 +30,7 @@ Syntax: spotify> [command] [--flags] [values...]
 
 `pause`, `pp` - pause playback on active device
 
-`vol [--set, --up, --down]`, `v [--set, --up, --down]` - control volume on active device
+`vol [--set, --up, --down]`, `v [-s, -u, -d]` - control volume on active device
 
 
 ## Example Usage
