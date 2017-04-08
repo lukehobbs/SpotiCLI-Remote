@@ -61,3 +61,8 @@ spotify> vol --up
 spotify> vol
 Volume: 90
 ```
+
+
+## Acknowlegments
+
+Thanks to Zac Bergquist for the [Go wrapper for the Spotify Web API](https://github.com/zmb3/spotify) that made this project possible!
