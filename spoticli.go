@@ -14,7 +14,8 @@ import (
 
 	"github.com/bobappleyard/readline"
 	"github.com/urfave/cli"
-	"github.com/zmb3/spotify"
+	"github.com/lukehobbs/spotify"
+	//"github.com/zmb3/spotify"
 	"golang.org/x/oauth2"
 )
 
@@ -202,6 +203,24 @@ func main() {
 			},
 		},
 		{
+			Name:	"next",
+			Aliases:	[]string{"n"},
+			Usage:	"Skip to the next track in queue",
+			Action: func(c *cli.Context) error {
+				next()
+				return nil
+			},
+		},
+		{
+			Name: "prev",
+			Aliases:	[]string{"pr"},
+			Usage: "Skip to the previous track in queue",
+			Action:	func(c *cli.Context) error {
+				prev()
+				return nil
+			},
+		},
+		{
 			Name:    "quit",
 			Aliases: []string{"q"},
 			Usage:   "Quit application",
@@ -229,6 +248,22 @@ func main() {
 	}
 
 	app.Run(os.Args)
+}
+
+func next() {
+	client := auth.NewClient(tok)
+	err := client.Next()
+	if err != nil {
+		panic(err)
+	}
+}
+
+func prev() {
+	client := auth.NewClient(tok)
+	err := client.Previous()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func setVolume(p int) {
