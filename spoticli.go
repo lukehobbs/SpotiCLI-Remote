@@ -11,10 +11,11 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"text/template"
 
 	"github.com/bobappleyard/readline"
-	"github.com/urfave/cli"
 	"github.com/lukehobbs/spotify"
+	"github.com/urfave/cli"
 	//"github.com/zmb3/spotify"
 	"golang.org/x/oauth2"
 )
@@ -22,6 +23,11 @@ import (
 const redirectURL = "http://localhost:8080/callback"
 const tokendir = "/.spoticli"
 const tokenfile = tokendir + "/token.gob"
+
+const trackTemplate = `Track:  {{.Name}}
+Artist:	{{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
+Album:	{{.Album.Name}}
+`
 
 var (
 	auth = spotify.NewAuthenticator(
@@ -164,13 +170,13 @@ func main() {
 			Action: func(c *cli.Context) error {
 				if c.Args().Present() {
 					cli.ShowCommandHelp(c, "vol")
-          return nil
+					return nil
 				}
-        defer func() {  // Recover if no devices are active
-          if r := recover(); r != nil {
-            fmt.Println(r)
-          }
-        }()
+				defer func() { // Recover if no devices are active
+					if r := recover(); r != nil {
+						fmt.Println(r)
+					}
+				}()
 				if c.NumFlags() == 2 { // Flag is one of: [--up, --down, --set]
 					if c.IsSet("up") {
 						volumePlus(10)
@@ -186,7 +192,7 @@ func main() {
 					}
 				}
 				if c.NumFlags() == 0 {
-          current := getVolume()
+					current := getVolume()
 					fmt.Println("Volume: ", current)
 					return nil
 				}
@@ -197,25 +203,26 @@ func main() {
 		{
 			Name:    "current",
 			Aliases: []string{"c"},
-			Usage:   "Display information about the currently playing song",
+			Usage:   "Display information about the currently playing track",
 			Action: func(c *cli.Context) error {
+				displayCurrentTrack()
 				return nil
 			},
 		},
 		{
-			Name:	"next",
-			Aliases:	[]string{"n"},
-			Usage:	"Skip to the next track in queue",
+			Name:    "next",
+			Aliases: []string{"n"},
+			Usage:   "Skip to the next track in queue",
 			Action: func(c *cli.Context) error {
 				next()
 				return nil
 			},
 		},
 		{
-			Name: "prev",
-			Aliases:	[]string{"pr"},
-			Usage: "Skip to the previous track in queue",
-			Action:	func(c *cli.Context) error {
+			Name:    "prev",
+			Aliases: []string{"pr"},
+			Usage:   "Skip to the previous track in queue",
+			Action: func(c *cli.Context) error {
 				prev()
 				return nil
 			},
@@ -250,6 +257,28 @@ func main() {
 	app.Run(os.Args)
 }
 
+func displayCurrentTrack() {
+	track := getCurrentTrack()
+	t := template.New("trackTemplate")
+	t, err := t.Parse(trackTemplate)
+	if err != nil {
+		panic(err)
+	}
+	err = t.Execute(os.Stdout, track)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func getCurrentTrack() *spotify.FullTrack {
+	client := auth.NewClient(tok)
+	current, err := client.PlayerCurrentlyPlaying()
+	if err != nil {
+		panic(err)
+	}
+	return current.Item
+}
+
 func next() {
 	client := auth.NewClient(tok)
 	err := client.Next()
@@ -274,29 +303,33 @@ func setVolume(p int) {
 }
 
 func getVolume() int {
-  current := -1
-  client := auth.NewClient(tok)
-  devices, err := client.PlayerDevices()
+	current := -1
+	client := auth.NewClient(tok)
+	devices, err := client.PlayerDevices()
 	if err != nil {
 		panic(err)
 	}
 	for _, v := range devices {
 		if v.Active == true {
-      current = v.Volume
+			current = v.Volume
 		}
 	}
-  if current == -1 {
-    panic("Error: no devices are active, please begin playback first")
-  }
-  return current
+	if current == -1 {
+		panic("Error: no devices are active, please begin playback first")
+	}
+	return current
 }
 
 func volumePlus(v int) {
-  current := getVolume()
-  newvol := current + v
-  if newvol > 100 { newvol = 100}
-  if newvol < 0 {newvol = 0}
-  setVolume(newvol)
+	current := getVolume()
+	newvol := current + v
+	if newvol > 100 {
+		newvol = 100
+	}
+	if newvol < 0 {
+		newvol = 0
+	}
+	setVolume(newvol)
 }
 
 func play(i int) {
@@ -312,7 +345,7 @@ func play(i int) {
 	if err != nil {
 		panic(err)
 	}
-	ID := []spotify.ID{devices[i-1].ID}
+	ID := devices[i-1].ID
 	err = client.TransferPlayback(ID, true)
 	if err != nil {
 		panic(err)
