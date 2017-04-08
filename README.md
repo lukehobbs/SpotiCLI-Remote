@@ -20,6 +20,7 @@ SpotiCLI Remote is a WIP command line interface, written in Go, that controls me
 ## Stretch Goals
 
 - Daemon to monitor currently playing media in plain text for scripting purposes (polybar, conky, etc.)
+- Select songs using a fuzzy search (i.e. spotify> play --song Anthem Part Two)
 
 ## Currently Implemented Commands
 
@@ -37,10 +38,14 @@ Syntax: spotify> [command] [--flags] [values...]
 
 `prev`, `pr` - skip to previous track
 
+`current`, `c` - display information about the currently playing track
+
 
 ## Example Usage
 
 ```
+$ spotifycli
+You are logged in as: lukehobbs
 spotify> devices
 [1]=Samsung (TV)
 [2]=Desktop (Computer) ACTIVE
@@ -60,6 +65,11 @@ Volume: 80
 spotify> vol --up
 spotify> vol
 Volume: 90
+
+spotify> current
+Track:  Shut Up
+Artist:	blink-182
+Album:	Take Off Your Pants And Jacket
 ```
 
 
