@@ -8,6 +8,8 @@ SpotifyCNCT is a WIP command line interface, written in Go, that controls media 
 - ~~Login to Spotify through WebAPI~~
 - ~~Store OAuth 2 Token in user's home directory to avoid having to login every run~~
 - Control volume of media playback
+- Allow selection of devices using a search
+  - i.e. `play -d Amazon Echo`
 - Change options (shuffle/repeat)
 - Seek options (fast forward, rewind)
 - ~~Control device selection~~

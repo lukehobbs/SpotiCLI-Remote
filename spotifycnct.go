@@ -9,7 +9,6 @@ import (
 	"os"
 	"os/user"
 	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -79,6 +78,12 @@ func startAuth() {
 }
 
 func main() {
+	// Destination variables for command flags
+	var (
+		devid      int
+		volpercent int
+	)
+
 	app := cli.NewApp()
 	app.Name = "spotifycnct"
 	app.Version = "0.0.1"
@@ -92,13 +97,6 @@ func main() {
 	app.Usage = "Control Spotify Connect enabled devices via terminal."
 	app.UsageText = "spotify> command [arguments...]"
 
-	// app.Flags = []cli.Flag{
-	// 	cli.StringFlag{
-	// 		Name:  "c, config",
-	// 		Usage: "Load configuration from `FILE`",
-	// 	},
-	// }
-
 	app.Commands = []cli.Command{
 		{
 			Name:    "devices",
@@ -111,18 +109,23 @@ func main() {
 		},
 		{
 			Name:    "play",
-      HelpName: "play DEVICE_ID, play DEVICE_ID",
 			Aliases: []string{"p"},
-			Usage:   "Start/Resume playback on `DEVICE_ID`, or currently playing device if not specified",
+			Flags: []cli.Flag{
+				cli.IntFlag{
+					Name:        "device, d",
+					Usage:       "Transfer playback to `DEVICE_NUMBER`",
+					Destination: &devid,
+				},
+			},
+			Usage: "Start/Resume playback on device, or currently playing device if none specified",
 			Action: func(c *cli.Context) error {
-				if c.Args().Get(0) != "" {
-					arg1, err := strconv.ParseUint(c.Args().Get(0), 10, 0)
-					if err != nil {
-						fmt.Println("Play command only accepts numbers [1, 2, 3...]")
-					} else {
-						play(arg1)
+				if c.IsSet("device") {
+					if devid > 25 || devid < 0 { // Assuming user will not have more than 25 devices
+						fmt.Println("Incorrect Usage: argument is not a valid device ID: ", devid)
+						cli.ShowCommandHelp(c, "play")
+						return nil
 					}
-					return nil
+					play(devid)
 				}
 				play(0)
 				return nil
@@ -138,9 +141,62 @@ func main() {
 			},
 		},
 		{
-			Name:    "volume",
+			Name:    "vol",
 			Aliases: []string{"v"},
-			Usage:   "Set volume on currently playing device to `PERCENT`",
+			Flags: []cli.Flag{
+				cli.IntFlag{
+					Name:        "set, s",
+					Usage:       "Set volume to `PERCENT`",
+					Value:       -1, //  Percent is not specified
+					Destination: &volpercent,
+				},
+				cli.BoolFlag{
+					Name:  "up, u",
+					Usage: "Increase volume by 10%",
+				},
+				cli.BoolFlag{
+					Name:  "down, d",
+					Usage: "Decrease volume by 10%",
+				},
+			},
+			Usage: "Change volume on currently playing device",
+			Action: func(c *cli.Context) error {
+				if c.Args().Present() {
+					cli.ShowCommandHelp(c, "vol")
+          return nil
+				}
+        defer func() {  // Recover if no devices are active
+          if r := recover(); r != nil {
+            fmt.Println(r)
+          }
+        }()
+				if c.NumFlags() == 2 { // Flag is one of: [--up, --down, --set]
+					if c.IsSet("up") {
+						volumePlus(10)
+						return nil
+					}
+					if c.IsSet("down") {
+						volumePlus(-10)
+						return nil
+					}
+					if c.IsSet("set") {
+						setVolume(volpercent)
+						return nil
+					}
+				}
+				if c.NumFlags() == 0 {
+          current := getVolume()
+					fmt.Println("Volume: ", current)
+					return nil
+				}
+				// ERROR
+				return nil
+			},
+		},
+		{
+			Name:    "current",
+			Aliases: []string{"c"},
+			Usage:   "Display information about the currently playing song",
 			Action: func(c *cli.Context) error {
 				return nil
 			},
@@ -175,7 +231,40 @@ func main() {
 	app.Run(os.Args)
 }
 
-func play(i uint64) {
+func setVolume(p int) {
+	client := auth.NewClient(tok)
+	if err := client.Volume(p); err != nil {
+		panic(err)
+	}
+}
+
+func getVolume() int {
+  current := -1
+  client := auth.NewClient(tok)
+  devices, err := client.PlayerDevices()
+	if err != nil {
+		panic(err)
+	}
+	for _, v := range devices {
+		if v.Active == true {
+      current = v.Volume
+		}
+	}
+  if current == -1 {
+    panic("Error: no devices are active, please begin playback first")
+  }
+  return current
+}
+
+func volumePlus(v int) {
+  current := getVolume()
+  newvol := current + v
+  if newvol > 100 { newvol = 100}
+  if newvol < 0 {newvol = 0}
+  setVolume(newvol)
+}
+
+func play(i int) {
 	client := auth.NewClient(tok)
 	if i == 0 {
 		err := client.Play()
