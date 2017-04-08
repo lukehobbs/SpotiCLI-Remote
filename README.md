@@ -15,7 +15,7 @@ SpotiCLI Remote is a WIP command line interface, written in Go, that controls me
 - Seek options (fast forward, rewind)
 - ~~Control device selection~~
 - Add an option to clear the console
-- Skip track (next/previous song)
+- ~~Skip track (next/previous song)~~
 
 ## Stretch Goals
 
@@ -32,6 +32,10 @@ Syntax: spotify> [command] [--flags] [values...]
 `pause`, `pp` - pause playback on active device
 
 `vol [--set, --up, --down]`, `v [-s, -u, -d]` - control volume on active device
+
+`next`, `n` - skip to next track
+
+`prev`, `pr` - skip to previous track
 
 
 ## Example Usage
