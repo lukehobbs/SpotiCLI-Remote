@@ -9,18 +9,20 @@ SpotiCLI Remote is a WIP command line interface, written in Go, that controls me
 - ~~Store OAuth 2 Token in user's home directory to avoid having to login every run~~
 - ~~Control volume of media playback~~
 - ~~Get information about currently playing song~~
+- ~~Control device selection~~
+- ~~Skip track (next/previous song)~~
 - Allow selection of devices using a search
   - i.e. `play --device Amazon Echo`
 - Change options (shuffle/repeat)
 - Seek options (fast forward, rewind)
-- ~~Control device selection~~
 - Add an option to clear the console
-- ~~Skip track (next/previous song)~~
+- Search for a playlist to listen to
+- Search for an ablum to listen to
+- Search for a song to listen to
 
 ## Stretch Goals
 
-- Daemon to monitor currently playing media in plain text for scripting purposes (polybar, conky, etc.)
-- Select songs using a fuzzy search (i.e. spotify> play --song Anthem Part Two)
+- Daemon to monitor and report currently playing media in plain text for scripting purposes (polybar, conky, etc.)
 
 ## Currently Implemented Commands
 
