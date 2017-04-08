@@ -20,7 +20,7 @@ SpotifyCNCT is a WIP command line interface, written in Go, that controls media 
 
 - Daemon to monitor currently playing media in plain text for scripting purposes (polybar, conky, etc.)
 
-# Currently Implemented Commands
+## Currently Implemented Commands
 
 Syntax: spotify> [command] [--flags] [values...]
 
@@ -31,7 +31,7 @@ Syntax: spotify> [command] [--flags] [values...]
 `pause` - pause playback on currently playing device
 
 
-# Example Usage
+## Example Usage
 
 ```
 spotify> devices
