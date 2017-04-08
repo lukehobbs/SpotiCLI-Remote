@@ -31,7 +31,7 @@ Syntax: spotify> [command] [--flags] [values...]
 `pause` - pause playback on currently playing device
 
 
-# Example
+# Example Usage
 
 ```
 spotify> devices
