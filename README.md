@@ -8,7 +8,7 @@ SpotiCLI Remote is a WIP command line interface, written in Go, that controls me
 - ~~Login to Spotify through WebAPI~~
 - ~~Store OAuth 2 Token in user's home directory to avoid having to login every run~~
 - ~~Control volume of media playback~~
-- Get information about currently playing song
+- ~~Get information about currently playing song~~
 - Allow selection of devices using a search
   - i.e. `play --device Amazon Echo`
 - Change options (shuffle/repeat)
