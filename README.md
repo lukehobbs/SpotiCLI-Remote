@@ -1,6 +1,6 @@
-# Spoticonn - Spotify Connect CLI Remote
+# SpotiConn - Spotify Connect CLI Remote
 
-Spoticonn is a WIP command line interface, written in Go, that controls media playback over spotify connected devices using the [Spotify Web API](https://api.spotify.com).
+SpotiConn is a WIP command line interface, written in Go, that controls media playback over spotify connected devices using the [Spotify Web API](https://api.spotify.com).
 
 ## Todo
 

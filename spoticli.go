@@ -19,7 +19,7 @@ import (
 )
 
 const redirectURL = "http://localhost:8080/callback"
-const tokendir = "/.spoticonn"
+const tokendir = "/.spoticli"
 const tokenfile = tokendir + "/token.gob"
 
 var (
@@ -29,7 +29,7 @@ var (
 		spotify.ScopeUserReadPlaybackState,
 		spotify.ScopeUserModifyPlaybackState,
 	)
-	state = "spoticonn"
+	state = "SpotiCLI-Remote"
 	ch    = make(chan *spotify.Client)
 	tok   *oauth2.Token
 )
@@ -85,7 +85,7 @@ func main() {
 	)
 
 	app := cli.NewApp()
-	app.Name = "spoticonn"
+	app.Name = "SpotiCLI-Remote"
 	app.Version = "0.0.1"
 	app.Compiled = time.Now()
 	app.Authors = []cli.Author{
@@ -225,7 +225,7 @@ func main() {
 			break
 		}
 		readline.AddHistory(line)
-		app.Run(strings.Fields("spoticonn " + line))
+		app.Run(strings.Fields("spoticli " + line))
 	}
 
 	app.Run(os.Args)
@@ -334,7 +334,7 @@ func saveToken(t *oauth2.Token) error {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_ = os.Mkdir(usr.HomeDir+"/.spoticonn", 0755)
+	_ = os.Mkdir(usr.HomeDir+"/.spoticli", 0755)
 	tokenpath := usr.HomeDir + tokenfile
 	file, err := os.OpenFile(tokenpath, os.O_CREATE|os.O_RDWR, 0755)
 	if err == nil {
