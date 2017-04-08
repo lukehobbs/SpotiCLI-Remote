@@ -15,6 +15,7 @@ SpotifyCNCT is a WIP command line interface, written in Go, that controls media 
 - Seek options (fast forward, rewind)
 - ~~Control device selection~~
 - Add an option to clear the console
+- Skip track (next/previous song)
 
 ## Stretch Goals
 
