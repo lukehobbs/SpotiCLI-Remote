@@ -29,7 +29,7 @@ SpotiCLI Remote is a WIP command line interface, written in Go, that controls me
 Syntax: spotify> [command] [--flags] [values...]
 
 ```
-spotify> devices
+spotify> devices                        List devices available for playback.
 
 spotify> play                           Start/Resume playback on current device.
 spotify> play --device <device_number>  Start/Resume playback on specified device.
