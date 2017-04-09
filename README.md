@@ -28,26 +28,26 @@ SpotiCLI Remote is a WIP command line interface, written in Go, that controls me
 
 Syntax: spotify> [command] [--flags] [values...]
 
-`devices`, `d` - list available devices and their IDs
+```
+spotify> devices
 
-`play [--device]`, `p [-d]` - start/resume playback on specified device or active device in none specified
+spotify> play                           Start/Resume playback on current device.
+spotify> play --device <device_number>  Start/Resume playback on specified device.
+spotify> pause                          Pause playback on current device.
 
-`pause`, `pp` - pause playback on active device
+spotify> vol                            Show the current volume.
+spotify> vol --set <percent>            Set the volume to an amount between 0 and 100.
+spotify> vol --up                       Increase the volume by 10%.
+spotify> vol --down                     Decrease the volume by 10%.
 
-`vol [--set, --up, --down]`, `v [-s, -u, -d]` - control volume on active device
+spotify> next                           Skip to the next song in playlist.
+spotify> prev                           Return to the previous song in playlist.
+spotify> current                        Show information about the currently playing song.
 
-`next`, `n` - skip to next track
-
-`prev`, `pr` - skip to previous track
-
-`current`, `c` - display information about the currently playing track
-
-`clear`, `clc` - clear the command window
-
-`help`, `h` - show help
-
-`quit`, `q` - quit application
-
+spotify> clear                          Clear the command window.
+spotify> help                           Show help.
+spotify> quit                           Quit application.
+```
 
 ## Example Usage
 
