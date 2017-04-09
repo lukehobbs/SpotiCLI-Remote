@@ -24,7 +24,7 @@ SpotiCLI Remote is a WIP command line interface, written in Go, that controls me
 
 - Daemon to monitor and report currently playing media in plain text for scripting purposes (polybar, conky, etc.)
 
-## Currently Implemented Commands
+## Usage
 
 Syntax: spotify> [command] [--flags] [values...]
 
@@ -49,7 +49,7 @@ spotify> help                           Show help.
 spotify> quit                           Quit application.
 ```
 
-## Example Usage
+## Example
 
 ```
 $ spotifycli
