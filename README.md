@@ -11,11 +11,11 @@ SpotiCLI Remote is a WIP command line interface, written in Go, that controls me
 - ~~Get information about currently playing song~~
 - ~~Control device selection~~
 - ~~Skip track (next/previous song)~~
-- Allow selection of devices using a search
-  - i.e. `play --device Amazon Echo`
+- ~~Add an option to clear the console~~
 - Change options (shuffle/repeat)
 - Seek options (fast forward, rewind)
-- Add an option to clear the console
+- Allow selection of devices using a search
+  - i.e. `play --device Amazon Echo`
 - Search for a playlist to listen to
 - Search for an ablum to listen to
 - Search for a song to listen to
@@ -41,6 +41,12 @@ Syntax: spotify> [command] [--flags] [values...]
 `prev`, `pr` - skip to previous track
 
 `current`, `c` - display information about the currently playing track
+
+`clear`, `clc` - clear the command window
+
+`help`, `h` - show help
+
+`quit`, `q` - quit application
 
 
 ## Example Usage

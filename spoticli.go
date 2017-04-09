@@ -24,7 +24,7 @@ const redirectURL = "http://localhost:8080/callback"
 const tokendir = "/.spoticli"
 const tokenfile = tokendir + "/token.gob"
 
-const trackTemplate = `Track:  {{.Name}}
+const longTrackTemplate = `Track:  {{.Name}}
 Artist:	{{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
 Album:	{{.Album.Name}}
 `
@@ -228,6 +228,15 @@ func main() {
 			},
 		},
 		{
+			Name:			"clear",
+			Aliases:	[]string{"clc"},
+			Usage:		"Clear the command window",
+			Action: func(c *cli.Context) error {
+				clear()
+				return nil
+			},
+		},
+		{
 			Name:    "quit",
 			Aliases: []string{"q"},
 			Usage:   "Quit application",
@@ -257,10 +266,14 @@ func main() {
 	app.Run(os.Args)
 }
 
+func clear() {
+	os.Stdout.WriteString("\x1b[3;J\x1b[H\x1b[2J")
+}
+
 func displayCurrentTrack() {
 	track := getCurrentTrack()
-	t := template.New("trackTemplate")
-	t, err := t.Parse(trackTemplate)
+	t := template.New("longTrackTemplate")
+	t, err := t.Parse(longTrackTemplate)
 	if err != nil {
 		panic(err)
 	}
