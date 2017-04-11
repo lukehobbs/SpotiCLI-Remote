@@ -58,11 +58,11 @@ func init() {
 			panic(err)
 		}
 		// use the client to make calls that require authorization
-		user, err := client.CurrentUser()
+		usr, err := client.CurrentUser()
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("You are logged in as:", user.ID)
+		fmt.Println("You are logged in as:", usr.ID)
 	}
 }
 
@@ -81,11 +81,11 @@ func startAuth() {
 	client := <-ch
 
 	// use the client to make calls that require authorization
-	user, err := client.CurrentUser()
+	usr, err := client.CurrentUser()
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("You are logged in as:", user.ID)
+	fmt.Println("You are logged in as:", usr.ID)
 }
 
 func main() {
@@ -100,7 +100,7 @@ func main() {
 	app.Version = "0.0.1"
 	app.Compiled = time.Now()
 	app.Authors = []cli.Author{
-		cli.Author{
+		{
 			Name:  "Luke Hobbs",
 			Email: "lukeehobbs@gmail.com",
 		},
@@ -544,9 +544,9 @@ func listDevices() {
 	for i, v := range devices {
 		fmt.Printf("[%d]=%v (%v)", i+1, v.Name, v.Type)
 		if v.Active == true {
-			fmt.Printf(" ACTIVE\n")
+			fmt.Println(" ACTIVE")
 		} else {
-			fmt.Printf("\n")
+			fmt.Println()
 		}
 	}
 }
@@ -563,7 +563,7 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	}
 	// use the token to get an authenticated client
 	client := auth.NewClient(tok)
-	fmt.Fprintf(w, "Login Completed!")
+	fmt.Fprintln(w, "Login Completed!")
 	ch <- &client
 	err = saveToken(tok)
 	if err != nil {

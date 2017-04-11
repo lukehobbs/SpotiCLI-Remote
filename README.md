@@ -17,7 +17,7 @@ SpotiCLI Remote is a WIP command line interface, written in Go, that controls me
 - Allow selection of devices using a search
   - i.e. `play --device Amazon Echo`
 - Search for a playlist to listen to
-- Search for an ablum to listen to
+- Search for an album to listen to
 - Search for a song to listen to
 
 ## Stretch Goals
@@ -81,6 +81,6 @@ Album:	Take Off Your Pants And Jacket
 ```
 
 
-## Acknowlegments
+## Acknowledgements
 
 Thanks to Zac Bergquist for the [Go wrapper for the Spotify Web API](https://github.com/zmb3/spotify) that made this project possible!
