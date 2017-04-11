@@ -10,8 +10,8 @@ import (
 	"os/user"
 	"sort"
 	"strings"
-	"time"
 	"text/template"
+	"time"
 
 	"github.com/bobappleyard/readline"
 	"github.com/lukehobbs/spotify"
@@ -27,6 +27,10 @@ const tokenfile = tokendir + "/token.gob"
 const longTrackTemplate = `Track:  {{.Name}}
 Artist:	{{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
 Album:	{{.Album.Name}}
+`
+const shuffleTemplate = `Shuffle: {{if .ShuffleState}}on{{end}}{{if not .ShuffleState}}off{{end}}
+`
+const repeatTemplate = `Repeat: {{.RepeatState}}
 `
 
 var (
@@ -110,6 +114,10 @@ func main() {
 			Aliases: []string{"d"},
 			Usage:   "List available devices and their IDs",
 			Action: func(c *cli.Context) error {
+				if c.Args().Present() {
+					cli.ShowCommandHelp(c, "devices")
+					return nil
+				}
 				listDevices()
 				return nil
 			},
@@ -126,6 +134,10 @@ func main() {
 			},
 			Usage: "Start/Resume playback on device, or currently playing device if none specified",
 			Action: func(c *cli.Context) error {
+				if c.Args().Present() {
+					cli.ShowCommandHelp(c, "play")
+					return nil
+				}
 				if c.IsSet("device") {
 					if devid > 25 || devid < 0 { // Assuming user will not have more than 25 devices
 						fmt.Println("Incorrect Usage: argument is not a valid device ID: ", devid)
@@ -143,6 +155,10 @@ func main() {
 			Aliases: []string{"pp"},
 			Usage:   "Pause playback on currently playing device",
 			Action: func(c *cli.Context) error {
+				if c.Args().Present() {
+					cli.ShowCommandHelp(c, "pause")
+					return nil
+				}
 				pause()
 				return nil
 			},
@@ -150,6 +166,7 @@ func main() {
 		{
 			Name:    "vol",
 			Aliases: []string{"v"},
+			Usage:   "Change volume on currently playing device",
 			Flags: []cli.Flag{
 				cli.IntFlag{
 					Name:        "set, s",
@@ -166,7 +183,6 @@ func main() {
 					Usage: "Decrease volume by 10%",
 				},
 			},
-			Usage: "Change volume on currently playing device",
 			Action: func(c *cli.Context) error {
 				if c.Args().Present() {
 					cli.ShowCommandHelp(c, "vol")
@@ -205,6 +221,10 @@ func main() {
 			Aliases: []string{"c"},
 			Usage:   "Display information about the currently playing track",
 			Action: func(c *cli.Context) error {
+				if c.Args().Present() {
+					cli.ShowCommandHelp(c, "current")
+					return nil
+				}
 				displayCurrentTrack()
 				return nil
 			},
@@ -214,6 +234,10 @@ func main() {
 			Aliases: []string{"n"},
 			Usage:   "Skip to the next track in queue",
 			Action: func(c *cli.Context) error {
+				if c.Args().Present() {
+					cli.ShowCommandHelp(c, "next")
+					return nil
+				}
 				next()
 				return nil
 			},
@@ -223,16 +247,91 @@ func main() {
 			Aliases: []string{"pr"},
 			Usage:   "Skip to the previous track in queue",
 			Action: func(c *cli.Context) error {
+				if c.Args().Present() {
+					cli.ShowCommandHelp(c, "prev")
+					return nil
+				}
 				prev()
 				return nil
 			},
 		},
 		{
-			Name:			"clear",
-			Aliases:	[]string{"clc"},
-			Usage:		"Clear the command window",
+			Name:    "clear",
+			Aliases: []string{"clc"},
+			Usage:   "Clear the command window",
 			Action: func(c *cli.Context) error {
+				if c.Args().Present() {
+					cli.ShowCommandHelp(c, "clear")
+					return nil
+				}
 				clear()
+				return nil
+			},
+		},
+		{
+			Name:    "shuffle",
+			Aliases: []string{"s"},
+			Usage:   "turn on playback option shuffle",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "on",
+					Usage: "turn shuffle on",
+				},
+				cli.BoolFlag{
+					Name:  "off",
+					Usage: "turn shuffle off",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				if c.Args().Present() {
+					cli.ShowCommandHelp(c, "shuffle")
+					return nil
+				}
+				if c.IsSet("on") {
+					setShuffle(true)
+				}
+				if c.IsSet("off") {
+					setShuffle(false)
+				}
+				time.Sleep(200 * time.Millisecond) // Wait for shuffleState to update
+				displayOptions("shuffle")
+				return nil
+			},
+		},
+		{
+			Name:    "repeat",
+			Aliases: []string{"r"},
+			Usage:   "turn on playlist option repeat",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "off",
+					Usage: "turn repeat off",
+				},
+				cli.BoolFlag{
+					Name:  "track, t",
+					Usage: "turn on repeat track",
+				},
+				cli.BoolFlag{
+					Name:  "playlist, p",
+					Usage: "turn on repeat playlist",
+				},
+			},
+			Action: func(c *cli.Context) error {
+				if c.Args().Present() {
+					cli.ShowCommandHelp(c, "repeat")
+					return nil
+				}
+				if c.IsSet("off") {
+					setRepeat("off")
+				}
+				if c.IsSet("track") {
+					setRepeat("track")
+				}
+				if c.IsSet("playlist") {
+					setRepeat("playlist")
+				}
+				time.Sleep(200 * time.Millisecond) // Wait for shuffleState to update
+				displayOptions("repeat")
 				return nil
 			},
 		},
@@ -241,6 +340,10 @@ func main() {
 			Aliases: []string{"q"},
 			Usage:   "Quit application",
 			Action: func(c *cli.Context) error {
+				if c.Args().Present() {
+					cli.ShowCommandHelp(c, "quit")
+					return nil
+				}
 				os.Exit(0)
 				return nil
 			},
@@ -268,6 +371,65 @@ func main() {
 
 func clear() {
 	os.Stdout.WriteString("\x1b[3;J\x1b[H\x1b[2J")
+}
+
+func setRepeat(s string) {
+	client := auth.NewClient(tok)
+	switch s {
+	case "off":
+		err := client.Repeat("off")
+		if err != nil {
+			panic(err)
+		}
+	case "track":
+		err := client.Repeat("track")
+		if err != nil {
+			panic(err)
+		}
+	case "playlist":
+		err := client.Repeat("context")
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func setShuffle(b bool) {
+	client := auth.NewClient(tok)
+	err := client.Shuffle(b)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func displayOptions(s string) {
+	client := auth.NewClient(tok)
+	state, err := client.PlayerState()
+	if err != nil {
+		panic(err)
+	}
+	switch s {
+	case "shuffle":
+		t := template.New("shuffleTemplate")
+		t, err = t.Parse(shuffleTemplate)
+		if err != nil {
+			panic(err)
+		}
+		err = t.Execute(os.Stdout, state)
+		if err != nil {
+			panic(err)
+		}
+	case "repeat":
+		t := template.New("repeatTemplate")
+		t, err = t.Parse(repeatTemplate)
+		if err != nil {
+			panic(err)
+		}
+		err = t.Execute(os.Stdout, state)
+		if err != nil {
+			panic(err)
+		}
+	}
 }
 
 func displayCurrentTrack() {
