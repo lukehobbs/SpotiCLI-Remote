@@ -1,6 +1,6 @@
-# SpotiCLI Remote
+# Spotcon
 
-SpotiCLI Remote is a WIP command line interface, written in Go, that controls media playback over spotify connected devices using the [Spotify Web API](https://api.spotify.com).
+Spotcon is a WIP command line interface, written in Go, that controls media playback over spotify connected devices using the [Spotify Web API](https://api.spotify.com).
 
 ## Todo
 
