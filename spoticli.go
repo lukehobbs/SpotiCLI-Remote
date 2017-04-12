@@ -28,9 +28,8 @@ const longTrackTemplate = `Track:  {{.Name}}
 Artist:	{{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
 Album:	{{.Album.Name}}
 `
-const shuffleTemplate = `Shuffle: {{if .ShuffleState}}on{{end}}{{if not .ShuffleState}}off{{end}}
-`
-const repeatTemplate = `Repeat: {{.RepeatState}}
+const optionsTemplate = `Shuffle: {{if .ShuffleState}}on{{end}}{{if not .ShuffleState}}off{{end}}
+Repeat: {{.RepeatState}}
 `
 
 var (
@@ -54,14 +53,10 @@ func init() {
 		client := auth.NewClient(tok)
 		// Save new token
 		err = saveToken(tok)
-		if err != nil {
-			panic(err)
-		}
+		checkErr(err)
 		// use the client to make calls that require authorization
 		usr, err := client.CurrentUser()
-		if err != nil {
-			panic(err)
-		}
+		checkErr(err)
 		fmt.Println("You are logged in as:", usr.ID)
 	}
 }
@@ -72,7 +67,7 @@ func startAuth() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Got request for:", r.URL.String())
 	})
-	go http.ListenAndServe(":8080", nil)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 
 	url := auth.AuthURL(state)
 	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
@@ -82,9 +77,7 @@ func startAuth() {
 
 	// use the client to make calls that require authorization
 	usr, err := client.CurrentUser()
-	if err != nil {
-		log.Fatal(err)
-	}
+	checkErr(err)
 	fmt.Println("You are logged in as:", usr.ID)
 }
 
@@ -115,7 +108,8 @@ func main() {
 			Usage:   "List available devices and their IDs",
 			Action: func(c *cli.Context) error {
 				if c.Args().Present() {
-					cli.ShowCommandHelp(c, "devices")
+					err := cli.ShowCommandHelp(c, "devices")
+					checkErr(err)
 					return nil
 				}
 				listDevices()
@@ -135,13 +129,15 @@ func main() {
 			Usage: "Start/Resume playback on device, or currently playing device if none specified",
 			Action: func(c *cli.Context) error {
 				if c.Args().Present() {
-					cli.ShowCommandHelp(c, "play")
+					err := cli.ShowCommandHelp(c, "play")
+					checkErr(err)
 					return nil
 				}
 				if c.IsSet("device") {
 					if devid > 25 || devid < 0 { // Assuming user will not have more than 25 devices
 						fmt.Println("Incorrect Usage: argument is not a valid device ID: ", devid)
-						cli.ShowCommandHelp(c, "play")
+						err := cli.ShowCommandHelp(c, "play")
+						checkErr(err)
 						return nil
 					}
 					play(devid)
@@ -156,7 +152,8 @@ func main() {
 			Usage:   "Pause playback on currently playing device",
 			Action: func(c *cli.Context) error {
 				if c.Args().Present() {
-					cli.ShowCommandHelp(c, "pause")
+					err := cli.ShowCommandHelp(c, "pause")
+					checkErr(err)
 					return nil
 				}
 				pause()
@@ -185,7 +182,8 @@ func main() {
 			},
 			Action: func(c *cli.Context) error {
 				if c.Args().Present() {
-					cli.ShowCommandHelp(c, "vol")
+					err := cli.ShowCommandHelp(c, "vol")
+					checkErr(err)
 					return nil
 				}
 				defer func() { // Recover if no devices are active
@@ -222,7 +220,8 @@ func main() {
 			Usage:   "Display information about the currently playing track",
 			Action: func(c *cli.Context) error {
 				if c.Args().Present() {
-					cli.ShowCommandHelp(c, "current")
+					err := cli.ShowCommandHelp(c, "current")
+					checkErr(err)
 					return nil
 				}
 				displayCurrentTrack()
@@ -235,7 +234,8 @@ func main() {
 			Usage:   "Skip to the next track in queue",
 			Action: func(c *cli.Context) error {
 				if c.Args().Present() {
-					cli.ShowCommandHelp(c, "next")
+					err := cli.ShowCommandHelp(c, "next")
+					checkErr(err)
 					return nil
 				}
 				next()
@@ -248,7 +248,8 @@ func main() {
 			Usage:   "Skip to the previous track in queue",
 			Action: func(c *cli.Context) error {
 				if c.Args().Present() {
-					cli.ShowCommandHelp(c, "prev")
+					err := cli.ShowCommandHelp(c, "prev")
+					checkErr(err)
 					return nil
 				}
 				prev()
@@ -261,10 +262,11 @@ func main() {
 			Usage:   "Clear the command window",
 			Action: func(c *cli.Context) error {
 				if c.Args().Present() {
-					cli.ShowCommandHelp(c, "clear")
+					err := cli.ShowCommandHelp(c, "clear")
+					checkErr(err)
 					return nil
 				}
-				clear()
+				clear(c)
 				return nil
 			},
 		},
@@ -284,7 +286,8 @@ func main() {
 			},
 			Action: func(c *cli.Context) error {
 				if c.Args().Present() {
-					cli.ShowCommandHelp(c, "shuffle")
+					err := cli.ShowCommandHelp(c, "shuffle")
+					checkErr(err)
 					return nil
 				}
 				if c.IsSet("on") {
@@ -293,8 +296,6 @@ func main() {
 				if c.IsSet("off") {
 					setShuffle(false)
 				}
-				time.Sleep(200 * time.Millisecond) // Wait for shuffleState to update
-				displayOptions("shuffle")
 				return nil
 			},
 		},
@@ -318,7 +319,8 @@ func main() {
 			},
 			Action: func(c *cli.Context) error {
 				if c.Args().Present() {
-					cli.ShowCommandHelp(c, "repeat")
+					err := cli.ShowCommandHelp(c, "repeat")
+					checkErr(err)
 					return nil
 				}
 				if c.IsSet("off") {
@@ -330,8 +332,20 @@ func main() {
 				if c.IsSet("playlist") {
 					setRepeat("playlist")
 				}
-				time.Sleep(200 * time.Millisecond) // Wait for shuffleState to update
-				displayOptions("repeat")
+				return nil
+			},
+		},
+		{
+			Name:    "options",
+			Aliases: []string{"o"},
+			Usage:   "Display current playback options",
+			Action: func(c *cli.Context) error {
+				if c.Args().Present() {
+					err := cli.ShowCommandHelp(c, "options")
+					checkErr(err)
+					return nil
+				}
+				displayOptions()
 				return nil
 			},
 		},
@@ -341,7 +355,8 @@ func main() {
 			Usage:   "Quit application",
 			Action: func(c *cli.Context) error {
 				if c.Args().Present() {
-					cli.ShowCommandHelp(c, "quit")
+					err := cli.ShowCommandHelp(c, "quit")
+					checkErr(err)
 					return nil
 				}
 				os.Exit(0)
@@ -363,14 +378,22 @@ func main() {
 			break
 		}
 		readline.AddHistory(line)
-		app.Run(strings.Fields("spoticli " + line))
+		err = app.Run(strings.Fields("spoticli " + line))
+		checkErr(err)
 	}
 
-	app.Run(os.Args)
+	err := app.Run(os.Args)
+	checkErr(err)
 }
 
-func clear() {
-	os.Stdout.WriteString("\x1b[3;J\x1b[H\x1b[2J")
+func clear(c *cli.Context) {
+	if c.Args().Present() {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
+	_, err := os.Stdout.WriteString("\x1b[3;J\x1b[H\x1b[2J")
+	checkErr(err)
 }
 
 func setRepeat(s string) {
@@ -378,114 +401,74 @@ func setRepeat(s string) {
 	switch s {
 	case "off":
 		err := client.Repeat("off")
-		if err != nil {
-			panic(err)
-		}
+		checkErr(err)
 	case "track":
 		err := client.Repeat("track")
-		if err != nil {
-			panic(err)
-		}
+		checkErr(err)
 	case "playlist":
 		err := client.Repeat("context")
-		if err != nil {
-			panic(err)
-		}
+		checkErr(err)
 	}
 }
 
 func setShuffle(b bool) {
 	client := auth.NewClient(tok)
 	err := client.Shuffle(b)
-	if err != nil {
-		panic(err)
-	}
+	checkErr(err)
 }
 
-func displayOptions(s string) {
+func displayOptions() {
 	client := auth.NewClient(tok)
 	state, err := client.PlayerState()
-	if err != nil {
-		panic(err)
-	}
-	switch s {
-	case "shuffle":
-		t := template.New("shuffleTemplate")
-		t, err = t.Parse(shuffleTemplate)
-		if err != nil {
-			panic(err)
-		}
-		err = t.Execute(os.Stdout, state)
-		if err != nil {
-			panic(err)
-		}
-	case "repeat":
-		t := template.New("repeatTemplate")
-		t, err = t.Parse(repeatTemplate)
-		if err != nil {
-			panic(err)
-		}
-		err = t.Execute(os.Stdout, state)
-		if err != nil {
-			panic(err)
-		}
-	}
+	checkErr(err)
+	t := template.New("optionsTemplate")
+	t, err = t.Parse(optionsTemplate)
+	checkErr(err)
+	err = t.Execute(os.Stdout, state)
+	checkErr(err)
 }
 
 func displayCurrentTrack() {
 	track := getCurrentTrack()
 	t := template.New("longTrackTemplate")
 	t, err := t.Parse(longTrackTemplate)
-	if err != nil {
-		panic(err)
-	}
+	checkErr(err)
 	err = t.Execute(os.Stdout, track)
-	if err != nil {
-		panic(err)
-	}
+	checkErr(err)
 }
 
 func getCurrentTrack() *spotify.FullTrack {
 	client := auth.NewClient(tok)
 	current, err := client.PlayerCurrentlyPlaying()
-	if err != nil {
-		panic(err)
-	}
+	checkErr(err)
 	return current.Item
 }
 
 func next() {
 	client := auth.NewClient(tok)
 	err := client.Next()
-	if err != nil {
-		panic(err)
-	}
+	checkErr(err)
 }
 
 func prev() {
 	client := auth.NewClient(tok)
 	err := client.Previous()
-	if err != nil {
-		panic(err)
-	}
+	checkErr(err)
 }
 
 func setVolume(p int) {
 	client := auth.NewClient(tok)
-	if err := client.Volume(p); err != nil {
-		panic(err)
-	}
+	err := client.Volume(p)
+	checkErr(err)
 }
 
 func getVolume() int {
 	current := -1
 	client := auth.NewClient(tok)
 	devices, err := client.PlayerDevices()
-	if err != nil {
-		panic(err)
-	}
+	checkErr(err)
 	for _, v := range devices {
-		if v.Active == true {
+		if v.Active {
 			current = v.Volume
 		}
 	}
@@ -511,39 +494,29 @@ func play(i int) {
 	client := auth.NewClient(tok)
 	if i == 0 {
 		err := client.Play()
-		if err != nil {
-			panic(err)
-		}
+		checkErr(err)
 		return
 	}
 	devices, err := client.PlayerDevices()
-	if err != nil {
-		panic(err)
-	}
+	checkErr(err)
 	ID := devices[i-1].ID
 	err = client.TransferPlayback(ID, true)
-	if err != nil {
-		panic(err)
-	}
+	checkErr(err)
 }
 
 func pause() {
 	client := auth.NewClient(tok)
 	err := client.Pause()
-	if err != nil {
-		panic(err)
-	}
+	checkErr(err)
 }
 
 func listDevices() {
 	client := auth.NewClient(tok)
 	devices, err := client.PlayerDevices()
-	if err != nil {
-		panic(err)
-	}
+	checkErr(err)
 	for i, v := range devices {
 		fmt.Printf("[%d]=%v (%v)", i+1, v.Name, v.Type)
-		if v.Active == true {
+		if v.Active {
 			fmt.Println(" ACTIVE")
 		} else {
 			fmt.Println()
@@ -552,7 +525,8 @@ func listDevices() {
 }
 
 func completeAuth(w http.ResponseWriter, r *http.Request) {
-	tok, err := auth.Token(state, r)
+	var err error
+	tok, err = auth.Token(state, r)
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
 		log.Fatal(err)
@@ -563,42 +537,50 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	}
 	// use the token to get an authenticated client
 	client := auth.NewClient(tok)
-	fmt.Fprintln(w, "Login Completed!")
+	_, err = fmt.Fprintln(w, "Login Completed!")
+	checkErr(err)
 	ch <- &client
 	err = saveToken(tok)
-	if err != nil {
-		panic(err)
-	}
+	checkErr(err)
 }
 
 func saveToken(t *oauth2.Token) error {
 	tok := &t
 	usr, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
+	checkErr(err)
+	if _, err = os.Stat(usr.HomeDir + tokendir); os.IsNotExist(err) {
+		err = os.Mkdir(usr.HomeDir+tokendir, 0600)
+		checkErr(err)
 	}
-	_ = os.Mkdir(usr.HomeDir+"/.spoticli", 0755)
 	tokenpath := usr.HomeDir + tokenfile
-	file, err := os.OpenFile(tokenpath, os.O_CREATE|os.O_RDWR, 0755)
+	file, err := os.OpenFile(tokenpath, os.O_CREATE|os.O_RDWR, 0600)
 	if err == nil {
 		encoder := gob.NewEncoder(file)
 		err = encoder.Encode(tok)
+		checkErr(err)
 	}
-	file.Close()
+	err = file.Close()
+	checkErr(err)
 	return err
 }
 
 func loadToken() error {
 	usr, err := user.Current()
-	if err != nil {
-		log.Fatal(err)
-	}
+	checkErr(err)
 	tokenpath := usr.HomeDir + tokenfile
 	file, err := os.Open(tokenpath)
 	if err == nil {
 		decoder := gob.NewDecoder(file)
 		err = decoder.Decode(&tok)
+		checkErr(err)
 	}
-	file.Close()
+	err = file.Close()
+	checkErr(err)
 	return err
+}
+
+func checkErr(err error) {
+	if err != nil {
+		log.Fatal("ERROR:", err)
+	}
 }
