@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/bobappleyard/readline"
-	"github.com/urfave/cli"
 	"github.com/lukehobbs/spotify"
+	"github.com/urfave/cli"
 	//"github.com/zmb3/spotify"
 	"golang.org/x/oauth2"
 )
@@ -60,7 +60,7 @@ func init() {
 func main() {
 	// Destination variables for command flags
 	var (
-	//	devid      int
+		//	devid      int
 		volpercent int
 	)
 
@@ -83,12 +83,7 @@ func main() {
 			Aliases: []string{"d"},
 			Usage:   "List available devices and their IDs",
 			Action: func(c *cli.Context) error {
-				if c.Args().Present() {
-					err := cli.ShowCommandHelp(c, "devices")
-					checkErr(err)
-					return nil
-				}
-				listDevices()
+				devicesAction(c)
 				return nil
 			},
 		},
@@ -97,18 +92,13 @@ func main() {
 			Aliases: []string{"p"},
 			Flags: []cli.Flag{
 				cli.IntFlag{
-					Name:        "device, d",
-					Usage:       "Transfer playback to `DEVICE_NUMBER`",
-					Value:	     0,
+					Name:  "device, d",
+					Usage: "Transfer playback to `DEVICE_NUMBER`",
+					Value: 0,
 				},
 			},
 			Usage: "Start/Resume playback on device, or currently playing device if none specified",
 			Action: func(c *cli.Context) error {
-				if c.Args().Present() {
-					err := cli.ShowCommandHelp(c, "play")
-					checkErr(err)
-					return nil
-				}
 				playAction(c)
 				return nil
 			},
@@ -118,12 +108,7 @@ func main() {
 			Aliases: []string{"pp"},
 			Usage:   "Pause playback on currently playing device",
 			Action: func(c *cli.Context) error {
-				if c.Args().Present() {
-					err := cli.ShowCommandHelp(c, "pause")
-					checkErr(err)
-					return nil
-				}
-				pause()
+				pauseAction(c)
 				return nil
 			},
 		},
@@ -186,12 +171,7 @@ func main() {
 			Aliases: []string{"c"},
 			Usage:   "Display information about the currently playing track",
 			Action: func(c *cli.Context) error {
-				if c.Args().Present() {
-					err := cli.ShowCommandHelp(c, "current")
-					checkErr(err)
-					return nil
-				}
-				displayCurrentTrack()
+				currentAction(c)
 				return nil
 			},
 		},
@@ -200,12 +180,7 @@ func main() {
 			Aliases: []string{"n"},
 			Usage:   "Skip to the next track in queue",
 			Action: func(c *cli.Context) error {
-				if c.Args().Present() {
-					err := cli.ShowCommandHelp(c, "next")
-					checkErr(err)
-					return nil
-				}
-				next()
+				nextAction(c)
 				return nil
 			},
 		},
@@ -214,12 +189,7 @@ func main() {
 			Aliases: []string{"pr"},
 			Usage:   "Skip to the previous track in queue",
 			Action: func(c *cli.Context) error {
-				if c.Args().Present() {
-					err := cli.ShowCommandHelp(c, "prev")
-					checkErr(err)
-					return nil
-				}
-				prev()
+				prevAction(c)
 				return nil
 			},
 		},
@@ -228,12 +198,7 @@ func main() {
 			Aliases: []string{"clc"},
 			Usage:   "Clear the command window",
 			Action: func(c *cli.Context) error {
-				if c.Args().Present() {
-					err := cli.ShowCommandHelp(c, "clear")
-					checkErr(err)
-					return nil
-				}
-				clear(c)
+				clearAction(c)
 				return nil
 			},
 		},
@@ -307,12 +272,7 @@ func main() {
 			Aliases: []string{"o"},
 			Usage:   "Display current playback options",
 			Action: func(c *cli.Context) error {
-				if c.Args().Present() {
-					err := cli.ShowCommandHelp(c, "options")
-					checkErr(err)
-					return nil
-				}
-				displayOptions()
+				optionsAction(c)
 				return nil
 			},
 		},
@@ -357,7 +317,7 @@ func quitAction(c *cli.Context) {
 	os.Exit(0)
 }
 
-func clear(c *cli.Context) {
+func clearAction(c *cli.Context) {
 	if c.Args().Present() {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
@@ -366,7 +326,6 @@ func clear(c *cli.Context) {
 	_, err := os.Stdout.WriteString("\x1b[3;J\x1b[H\x1b[2J")
 	checkErr(err)
 }
-
 
 func checkErr(err error) {
 	if err != nil {

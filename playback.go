@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/urfave/cli"
 	"fmt"
+	"github.com/lukehobbs/spotify"
+	"github.com/urfave/cli"
 	"os"
 	"text/template"
-	"github.com/lukehobbs/spotify"
 )
 
 func setRepeat(s string) {
@@ -29,7 +29,12 @@ func setShuffle(b bool) {
 	checkErr(err)
 }
 
-func displayOptions() {
+func optionsAction(c *cli.Context) {
+	if c.Args().Present() {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
 	client := auth.NewClient(tok)
 	state, err := client.PlayerState()
 	checkErr(err)
@@ -40,7 +45,12 @@ func displayOptions() {
 	checkErr(err)
 }
 
-func displayCurrentTrack() {
+func currentAction(c *cli.Context) {
+	if c.Args().Present() {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
 	trk := getCurrentTrack()
 	t := template.New("longTrackTemplate")
 	t, err := t.Parse(longTrackTemplate)
@@ -56,13 +66,23 @@ func getCurrentTrack() *spotify.FullTrack {
 	return current.Item
 }
 
-func next() {
+func nextAction(c *cli.Context) {
+	if c.Args().Present() {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
 	client := auth.NewClient(tok)
 	err := client.Next()
 	checkErr(err)
 }
 
-func prev() {
+func prevAction(c *cli.Context) {
+	if c.Args().Present() {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
 	client := auth.NewClient(tok)
 	err := client.Previous()
 	checkErr(err)
@@ -92,14 +112,14 @@ func getVolume() int {
 
 func volumePlus(a int) {
 	vol := getVolume()
-	new := vol + a
-	if new > 100 {
-		new = 100
+	s := vol + a
+	if s > 100 {
+		s = 100
 	}
-	if new < 0 {
-		new = 0
+	if s < 0 {
+		s = 0
 	}
-	setVolume(new)
+	setVolume(s)
 }
 
 func playAction(c *cli.Context) {
@@ -127,13 +147,23 @@ func playAction(c *cli.Context) {
 	checkErr(err)
 }
 
-func pause() {
+func pauseAction(c *cli.Context) {
+	if c.Args().Present() {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
 	client := auth.NewClient(tok)
 	err := client.Pause()
 	checkErr(err)
 }
 
-func listDevices() {
+func devicesAction(c *cli.Context) {
+	if c.Args().Present() {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
 	client := auth.NewClient(tok)
 	d, err := client.PlayerDevices()
 	checkErr(err)

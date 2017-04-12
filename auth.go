@@ -1,15 +1,14 @@
 package main
 
 import (
-	"net/http"
-	"log"
+	"encoding/gob"
 	"fmt"
 	"golang.org/x/oauth2"
-	"os/user"
+	"log"
+	"net/http"
 	"os"
-	"encoding/gob"
+	"os/user"
 )
-
 
 func startAuth() {
 	// first start an HTTP server
