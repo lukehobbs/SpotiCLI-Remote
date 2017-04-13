@@ -58,14 +58,8 @@ func init() {
 }
 
 func main() {
-	// Destination variables for command flags
-	var (
-		//	devid      int
-		volpercent int
-	)
-
 	app := cli.NewApp()
-	app.Name = "SpotiCLI-Remote"
+	app.Name = "Spotcon"
 	app.Version = "0.0.1"
 	app.Compiled = time.Now()
 	app.Authors = []cli.Author{
@@ -90,13 +84,6 @@ func main() {
 		{
 			Name:    "play",
 			Aliases: []string{"p"},
-			Flags: []cli.Flag{
-				cli.IntFlag{
-					Name:  "device, d",
-					Usage: "Transfer playback to `DEVICE_NUMBER`",
-					Value: 0,
-				},
-			},
 			Usage: "Start/Resume playback on device, or currently playing device if none specified",
 			Action: func(c *cli.Context) error {
 				playAction(c)
@@ -115,61 +102,28 @@ func main() {
 		{
 			Name:    "vol",
 			Aliases: []string{"v"},
-			Usage:   "Change volume on currently playing device",
-			Flags: []cli.Flag{
-				cli.IntFlag{
-					Name:        "set, s",
-					Usage:       "Set volume to `PERCENT`",
-					Value:       -1, //  Percent is not specified
-					Destination: &volpercent,
-				},
-				cli.BoolFlag{
-					Name:  "up, u",
-					Usage: "Increase volume by 10%",
-				},
-				cli.BoolFlag{
-					Name:  "down, d",
-					Usage: "Decrease volume by 10%",
-				},
-			},
-			Action: func(c *cli.Context) error {
-				if c.Args().Present() {
-					err := cli.ShowCommandHelp(c, "vol")
-					checkErr(err)
+			Usage:   "Options for changing volume on currently playing device",
+			Action:	func(c *cli.Context) error {
+				if c.Args().First() == "up" {
+					volUpAction(c)
 					return nil
 				}
-				defer func() { // Recover if no devices are active
-					if r := recover(); r != nil {
-						fmt.Println(r)
-					}
-				}()
-				if c.NumFlags() == 2 { // Flag is one of: [--up, --down, --set]
-					if c.IsSet("up") {
-						volumePlus(10)
-						return nil
-					}
-					if c.IsSet("down") {
-						volumePlus(-10)
-						return nil
-					}
-					if c.IsSet("set") {
-						setVolume(volpercent)
-						return nil
-					}
-				}
-				if c.NumFlags() == 0 {
-					current := getVolume()
-					fmt.Println("Volume: ", current)
+				if c.Args().First() == "down" {
+					volDownAction(c)
 					return nil
 				}
-				// ERROR
+				if c.Args().First() == "set" {
+					volSetAction(c)
+					return nil
+				}
+				fmt.Println("Volume: ", getVolume())
 				return nil
 			},
 		},
 		{
 			Name:    "current",
 			Aliases: []string{"c"},
-			Usage:   "Display information about the currently playing track",
+			Usage:   "Display information about the current playback",
 			Action: func(c *cli.Context) error {
 				currentAction(c)
 				return nil
@@ -205,29 +159,9 @@ func main() {
 		{
 			Name:    "shuffle",
 			Aliases: []string{"s"},
-			Usage:   "turn on playback option shuffle",
-			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "on",
-					Usage: "turn shuffle on",
-				},
-				cli.BoolFlag{
-					Name:  "off",
-					Usage: "turn shuffle off",
-				},
-			},
+			Usage:   "Toggle playback option shuffle",
 			Action: func(c *cli.Context) error {
-				if c.Args().Present() {
-					err := cli.ShowCommandHelp(c, "shuffle")
-					checkErr(err)
-					return nil
-				}
-				if c.IsSet("on") {
-					setShuffle(true)
-				}
-				if c.IsSet("off") {
-					setShuffle(false)
-				}
+				shuffleAction(c)
 				return nil
 			},
 		},
@@ -291,7 +225,7 @@ func main() {
 	sort.Sort(cli.CommandsByName(app.Commands))
 
 	for {
-		line, err := readline.String("spotify> ")
+		line, err := readline.String("spotcon> ")
 		if err == io.EOF {
 			break
 		}
@@ -300,7 +234,7 @@ func main() {
 			break
 		}
 		readline.AddHistory(line)
-		err = app.Run(strings.Fields("spoticli " + line))
+		err = app.Run(strings.Fields("spotcon " + line))
 		checkErr(err)
 	}
 

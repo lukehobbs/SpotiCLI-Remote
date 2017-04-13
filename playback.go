@@ -6,6 +6,8 @@ import (
 	"github.com/urfave/cli"
 	"os"
 	"text/template"
+	"strconv"
+	"time"
 )
 
 func setRepeat(s string) {
@@ -23,14 +25,35 @@ func setRepeat(s string) {
 	}
 }
 
-func setShuffle(b bool) {
+func shuffleAction(c *cli.Context) {
+	if c.NArg() > 0 {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
 	client := auth.NewClient(tok)
-	err := client.Shuffle(b)
+	state, err := client.PlayerState()
 	checkErr(err)
+	if state.ShuffleState {
+		err = client.Shuffle(false)
+		checkErr(err)
+	} else {
+		err = client.Shuffle(true)
+		checkErr(err)
+	}
+	time.Sleep(250 * time.Millisecond)
+	fmt.Println("Shuffle: ", getShuffleState())
+}
+
+func getShuffleState() bool {
+	client := auth.NewClient(tok)
+	state, err := client.PlayerState()
+	checkErr(err)
+	return state.ShuffleState
 }
 
 func optionsAction(c *cli.Context) {
-	if c.Args().Present() {
+	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
@@ -46,7 +69,7 @@ func optionsAction(c *cli.Context) {
 }
 
 func currentAction(c *cli.Context) {
-	if c.Args().Present() {
+	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
@@ -67,7 +90,7 @@ func getCurrentTrack() *spotify.FullTrack {
 }
 
 func nextAction(c *cli.Context) {
-	if c.Args().Present() {
+	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
@@ -78,7 +101,7 @@ func nextAction(c *cli.Context) {
 }
 
 func prevAction(c *cli.Context) {
-	if c.Args().Present() {
+	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
@@ -88,9 +111,58 @@ func prevAction(c *cli.Context) {
 	checkErr(err)
 }
 
-func setVolume(p int) {
+func volUpAction(c *cli.Context) {
+	if c.NArg() > 1 {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
+	v := getVolume()
+	i := v + 10
+	if i > 100 {
+		i = 100
+	}
+	setVolume(i)
+	time.Sleep(250 * time.Millisecond)
+	fmt.Println("Volume: ", getVolume())
+}
+
+func volDownAction(c *cli.Context) {
+	if c.NArg() > 1 {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
+	v := getVolume()
+	i := v - 10
+	if i < 0 {
+		i = 0
+	}
+	setVolume(i)
+	time.Sleep(250 * time.Millisecond)
+	fmt.Println("Volume: ", getVolume())
+}
+
+func volSetAction(c *cli.Context) {
+	if c.NArg() != 2 {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
+	i, err := strconv.Atoi(c.Args().Get(1))
+	checkErr(err)
+	if i > 100 || i < 0 {
+		fmt.Println("ERROR: Invalid argument, ", i)
+		return
+	}
+	setVolume(i)
+	time.Sleep(250 * time.Millisecond)
+	fmt.Println("Volume: ", getVolume())
+}
+
+func setVolume(i int) {
 	client := auth.NewClient(tok)
-	err := client.Volume(p)
+	err := client.Volume(i)
 	checkErr(err)
 }
 
@@ -105,39 +177,26 @@ func getVolume() int {
 		}
 	}
 	if a == -1 {
-		panic("Error: no devices are active, please begin playback first")
+		panic("Error: no devices are active, please begin playback on a Spotify Conneceted device first")
 	}
 	return a
 }
 
-func volumePlus(a int) {
-	vol := getVolume()
-	s := vol + a
-	if s > 100 {
-		s = 100
-	}
-	if s < 0 {
-		s = 0
-	}
-	setVolume(s)
-}
-
 func playAction(c *cli.Context) {
-	i := c.Int("device")
 	client := auth.NewClient(tok)
-
-	if i == 0 {
+	if c.Args().First() == "" {
 		err := client.Play()
 		checkErr(err)
 		return
 	}
+	i, err := strconv.Atoi(c.Args().First())
+	checkErr(err)
 
 	d, err := client.PlayerDevices()
 	checkErr(err)
-
 	if i > len(d) {
 		fmt.Println("ERROR: Incorrect device ID, ", i)
-		err = cli.ShowCommandHelp(c, c.App.Name)
+		err = cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
 	}
@@ -148,7 +207,7 @@ func playAction(c *cli.Context) {
 }
 
 func pauseAction(c *cli.Context) {
-	if c.Args().Present() {
+	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
@@ -159,7 +218,7 @@ func pauseAction(c *cli.Context) {
 }
 
 func devicesAction(c *cli.Context) {
-	if c.Args().Present() {
+	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
