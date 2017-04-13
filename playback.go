@@ -5,8 +5,8 @@ import (
 	"github.com/lukehobbs/spotify"
 	"github.com/urfave/cli"
 	"os"
-	"text/template"
 	"strconv"
+	"text/template"
 	"time"
 )
 

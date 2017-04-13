@@ -82,9 +82,9 @@ func main() {
 			},
 		},
 		{
-			Name:    "play",
-			Aliases: []string{"p"},
-			Usage: "Start/Resume playback on device, or currently playing device if none specified",
+			Name:      "play",
+			Aliases:   []string{"p"},
+			Usage:     "Start/Resume playback on device, or currently playing device if none specified",
 			ArgsUsage: "<device-id>",
 			Action: func(c *cli.Context) error {
 				playAction(c)
@@ -101,11 +101,11 @@ func main() {
 			},
 		},
 		{
-			Name:    "vol",
-			Aliases: []string{"v"},
-			Usage:   "Options for changing volume on currently playing device",
+			Name:      "vol",
+			Aliases:   []string{"v"},
+			Usage:     "Options for changing volume on currently playing device",
 			ArgsUsage: "[up | down | set] <percent>",
-			Action:	func(c *cli.Context) error {
+			Action: func(c *cli.Context) error {
 				if c.Args().First() == "up" {
 					volUpAction(c)
 					return nil
@@ -168,9 +168,9 @@ func main() {
 			},
 		},
 		{
-			Name:    "repeat",
-			Aliases: []string{"r"},
-			Usage:   "turn on playlist option repeat",
+			Name:      "repeat",
+			Aliases:   []string{"r"},
+			Usage:     "turn on playlist option repeat",
 			ArgsUsage: "[off | track | playlist]",
 			Action: func(c *cli.Context) error {
 				repeatAction(c)
