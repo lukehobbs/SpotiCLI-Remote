@@ -35,7 +35,7 @@ var (
 		spotify.ScopeUserReadPlaybackState,
 		spotify.ScopeUserModifyPlaybackState,
 	)
-	state = "SpotiCLI-Remote"
+	state = "Spotcon"
 	ch    = make(chan *spotify.Client)
 	tok   *oauth2.Token
 )
@@ -69,7 +69,7 @@ func main() {
 		},
 	}
 	app.Usage = "Control Spotify Connect enabled devices via terminal."
-	app.UsageText = "spotify> command [arguments...]"
+	app.UsageText = "spotify> command [subcommand] [arguments...]"
 
 	app.Commands = []cli.Command{
 		{
@@ -85,6 +85,7 @@ func main() {
 			Name:    "play",
 			Aliases: []string{"p"},
 			Usage: "Start/Resume playback on device, or currently playing device if none specified",
+			ArgsUsage: "<device-id>",
 			Action: func(c *cli.Context) error {
 				playAction(c)
 				return nil
@@ -103,6 +104,7 @@ func main() {
 			Name:    "vol",
 			Aliases: []string{"v"},
 			Usage:   "Options for changing volume on currently playing device",
+			ArgsUsage: "[up | down | set] <percent>",
 			Action:	func(c *cli.Context) error {
 				if c.Args().First() == "up" {
 					volUpAction(c)
@@ -169,6 +171,7 @@ func main() {
 			Name:    "repeat",
 			Aliases: []string{"r"},
 			Usage:   "turn on playlist option repeat",
+			ArgsUsage: "[off | track | playlist]",
 			Action: func(c *cli.Context) error {
 				repeatAction(c)
 				return nil
