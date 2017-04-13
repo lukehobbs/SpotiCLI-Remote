@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/lukehobbs/spotify"
-	"github.com/urfave/cli"
 	"os"
 	"strconv"
 	"text/template"
 	"time"
+
+	"github.com/lukehobbs/spotify"
+	"github.com/urfave/cli"
 )
 
 func repeatAction(c *cli.Context) {

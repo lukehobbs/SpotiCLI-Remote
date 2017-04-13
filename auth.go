@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/gob"
 	"fmt"
-	"golang.org/x/oauth2"
 	"log"
 	"net/http"
 	"os"
 	"os/user"
+
+	"golang.org/x/oauth2"
 )
 
 func startAuth() {
