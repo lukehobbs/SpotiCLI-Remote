@@ -116,7 +116,7 @@ func main() {
 					volSetAction(c)
 					return nil
 				}
-				fmt.Println("Volume: ", getVolume())
+				fmt.Printf("Volume: %v%%\n", getVolume())
 				return nil
 			},
 		},
@@ -169,35 +169,8 @@ func main() {
 			Name:    "repeat",
 			Aliases: []string{"r"},
 			Usage:   "turn on playlist option repeat",
-			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "off",
-					Usage: "turn repeat off",
-				},
-				cli.BoolFlag{
-					Name:  "track, t",
-					Usage: "turn on repeat track",
-				},
-				cli.BoolFlag{
-					Name:  "playlist, p",
-					Usage: "turn on repeat playlist",
-				},
-			},
 			Action: func(c *cli.Context) error {
-				if c.Args().Present() {
-					err := cli.ShowCommandHelp(c, "repeat")
-					checkErr(err)
-					return nil
-				}
-				if c.IsSet("off") {
-					setRepeat("off")
-				}
-				if c.IsSet("track") {
-					setRepeat("track")
-				}
-				if c.IsSet("playlist") {
-					setRepeat("playlist")
-				}
+				repeatAction(c)
 				return nil
 			},
 		},

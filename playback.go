@@ -10,19 +10,40 @@ import (
 	"time"
 )
 
+func repeatAction(c *cli.Context) {
+	if c.NArg() < 1 {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
+	switch c.Args().First() {
+	case "track":
+		setRepeat("track")
+	case "playlist":
+		setRepeat("context")
+	case "off":
+		setRepeat("off")
+	default:
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
+	time.Sleep(250 * time.Millisecond)
+	client := auth.NewClient(tok)
+	s, err := client.PlayerState()
+	checkErr(err)
+	if s.RepeatState == "context" {
+		fmt.Println("Repeat: ", "playlist")
+	} else {
+		fmt.Println("Repeat: ", s.RepeatState)
+	}
+
+}
+
 func setRepeat(s string) {
 	client := auth.NewClient(tok)
-	switch s {
-	case "off":
-		err := client.Repeat("off")
-		checkErr(err)
-	case "track":
-		err := client.Repeat("track")
-		checkErr(err)
-	case "playlist":
-		err := client.Repeat("context")
-		checkErr(err)
-	}
+	err := client.Repeat(s)
+	checkErr(err)
 }
 
 func shuffleAction(c *cli.Context) {
@@ -124,7 +145,7 @@ func volUpAction(c *cli.Context) {
 	}
 	setVolume(i)
 	time.Sleep(250 * time.Millisecond)
-	fmt.Println("Volume: ", getVolume())
+	fmt.Printf("Volume: %v%%\n", getVolume())
 }
 
 func volDownAction(c *cli.Context) {
@@ -140,7 +161,7 @@ func volDownAction(c *cli.Context) {
 	}
 	setVolume(i)
 	time.Sleep(250 * time.Millisecond)
-	fmt.Println("Volume: ", getVolume())
+	fmt.Printf("Volume: %v%%\n", getVolume())
 }
 
 func volSetAction(c *cli.Context) {
@@ -157,7 +178,7 @@ func volSetAction(c *cli.Context) {
 	}
 	setVolume(i)
 	time.Sleep(250 * time.Millisecond)
-	fmt.Println("Volume: ", getVolume())
+	fmt.Printf("Volume: %v%%\n", getVolume())
 }
 
 func setVolume(i int) {
