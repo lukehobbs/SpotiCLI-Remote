@@ -1,8 +1,1 @@
 .idea/
-*.out
-.glide
-*.text
-*.dylib
-*.so
-*.dll
-*.exe
