@@ -201,7 +201,7 @@ func main() {
 	sort.Sort(cli.CommandsByName(app.Commands))
 
 	for {
-		line, err := readline.String("spotcon> ")
+		line, err := readline.String("\nspotcon> ")
 		if err == io.EOF {
 			break
 		}

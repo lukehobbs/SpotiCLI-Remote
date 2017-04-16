@@ -102,6 +102,7 @@ func currentAction(c *cli.Context) {
 	checkErr(err)
 	err = t.Execute(os.Stdout, trk)
 	checkErr(err)
+	fmt.Printf("Volume: %v%%\n", getVolume())
 }
 
 func getCurrentTrack() *spotify.FullTrack {
