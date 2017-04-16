@@ -10,9 +10,8 @@ import (
 	"time"
 
 	"github.com/bobappleyard/readline"
-	"github.com/lukehobbs/spotify"
 	"github.com/urfave/cli"
-	//"github.com/zmb3/spotify"
+	"github.com/zmb3/spotify"
 	"golang.org/x/oauth2"
 )
 

@@ -7,7 +7,7 @@ import (
 	"text/template"
 	"time"
 
-	"github.com/lukehobbs/spotify"
+	"github.com/zmb3/spotify"
 	"github.com/urfave/cli"
 )
 
