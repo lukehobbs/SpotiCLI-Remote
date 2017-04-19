@@ -6,11 +6,96 @@ import (
 	"strconv"
 	"text/template"
 	"time"
+	"strings"
 
 	"github.com/zmb3/spotify"
 	"github.com/urfave/cli"
 )
 
+var LastSearch *spotify.SearchResult
+
+func searchAction(c *cli.Context) {
+	var t int
+	client := auth.NewClient(tok)
+	q := strings.Join(c.Args(), " ")
+	if q == "" {
+		displayLastSearch()
+		return
+	}
+	if c.Bool("album"){
+		t += 1
+	}
+	if c.Bool("artist"){
+		t += 2
+	}
+	if c.Bool("playlist"){
+		t += 4
+	}
+	if c.Bool("track"){
+		t += 8
+	}
+	if t == 0 {
+		t = 15
+	}
+	st := spotify.SearchType(t)
+	var err error
+	LastSearch, err = client.Search(q, st)
+	checkErr(err)
+	displaySearchResults(LastSearch)
+}
+
+func displayLastSearch() {
+	if LastSearch == nil {
+		fmt.Println("No previous search results found.")
+		return
+	}
+	displaySearchResults(LastSearch)
+}
+
+func displaySearchResults(r *spotify.SearchResult){
+	if r.Tracks != nil {
+		fmt.Println("Tracks: ")
+		t := template.New("shortTrackTemplate")
+		t, err := t.Parse(shortTrackTemplate)
+		checkErr(err)
+		for i, v := range r.Tracks.Tracks{
+			if i > 4 {
+				break
+			}
+			fmt.Printf("  [%d]:\t", i+1)
+			err = t.Execute(os.Stdout, v)
+			checkErr(err)
+		}
+	}
+	if r.Artists != nil {
+		fmt.Println("Artists: ")
+		for i, v := range r.Artists.Artists {
+			if i > 4 {
+				break
+			}
+			fmt.Printf("  [%d]:\t%v\n", i+1, v.Name)
+		}
+	}
+	if r.Albums != nil {
+		fmt.Println("Albums: ")
+		for i, v := range r.Albums.Albums {
+			if i > 4 {
+				break
+			}
+			fmt.Printf("  [%d]:\t%v\n", i+1, v.Name)
+		}
+	}
+	if r.Playlists != nil {
+		fmt.Println("Playlists: ")
+		for i, v := range r.Playlists.Playlists {
+			if i > 4 {
+				break
+			}
+			fmt.Printf("  [%d]:\t%v\n", i+1, v.Name)
+		}
+	}
+
+}
 func repeatAction(c *cli.Context) {
 	if c.NArg() < 1 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)

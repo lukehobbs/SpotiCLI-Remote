@@ -18,10 +18,11 @@ import (
 const redirectURL = "http://localhost:8080/callback"
 const tokenDir = "/.spoticli"
 const tokenFile = tokenDir + "/token.gob"
-
 const longTrackTemplate = `Track:  {{.Name}}
 Artist:	{{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
 Album:	{{.Album.Name}}
+`
+const shortTrackTemplate = `"{{.Name}}" by {{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
 `
 const optionsTemplate = `Shuffle: {{if .ShuffleState}}on{{end}}{{if not .ShuffleState}}off{{end}}
 Repeat: {{.RepeatState}}
@@ -77,6 +78,33 @@ func main() {
 			Usage:   "List available devices and their IDs",
 			Action: func(c *cli.Context) error {
 				devicesAction(c)
+				return nil
+			},
+		},
+		{
+			Name:    "search",
+			Aliases: []string{"s"},
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name: "artist, ar",
+					Usage: "Search artists on Spotify",
+				},
+				cli.BoolFlag{
+					Name: "album, al",
+					Usage: "Search albums on Spotify",
+				},
+				cli.BoolFlag{
+					Name: "track, tr",
+					Usage: "Search tracks on Spotify",
+				},
+				cli.BoolFlag{
+					Name: "playlist, pl",
+					Usage: "Search playlists on Spotify",
+				},
+			},
+			Usage:   "Search Spotify for artists, albums, tracks, or playlists",
+			Action: func(c *cli.Context) error {
+				searchAction(c)
 				return nil
 			},
 		},
