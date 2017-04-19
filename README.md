@@ -16,9 +16,11 @@ Spotcon is a WIP command line interface, written in Go, that controls media play
 - Seek options (fast forward, rewind)
 - Allow selection of devices using a search
   - i.e. `play Amazon Echo`
-- Search for a playlist to listen to
-- Search for an album to listen to
-- Search for a song to listen to
+- ~~Search for a playlist to listen to~~
+- ~~Search for an album to listen to~~
+- ~~Search for a song to listen to~~
+  - Play track/album/artist/playlist from most recent search
+  - i.e. `play -t 2`
 
 ## Stretch Goals
 
@@ -34,6 +36,12 @@ spotcon> devices                        List devices available for playback.
 spotcon> play                           Start/Resume playback on current device.
 spotcon> play <device_number>           Start/Resume playback on specified device.
 spotcon> pause                          Pause playback on current device.
+
+spotcon> search <query>                 Search Spotify for <query>
+spotcon> search --track <query>         Search Spotify tracks for <query>
+spotcon> search --album <query>         Search Spotify albums for <query>
+spotcon> search --artist <query>        Search Spotify artists for <query>
+spotcon> search --playlist <query>      Search Spotify playlists for <query>
 
 spotcon> vol                            Show the current volume.
 spotcon> vol set <percent>              Set the volume to an amount between 0 and 100.
@@ -95,6 +103,40 @@ Repeat:  track
 
 spotcon> shuffle
 Shuffle: Off
+
+spotcon> search bridge
+Tracks: 
+  [1]:	"Water Under the Bridge" by Adele
+  [2]:	"Under The Bridge" by Red Hot Chili Peppers
+  [3]:	"Water Under the Bridge" by Adele
+  [4]:	"London Bridge" by Fergie
+  [5]:	"Under The Bridge" by Red Hot Chili Peppers
+Artists: 
+  [1]:	Alter Bridge
+  [2]:	Bridge to Grace
+  [3]:	Bridge
+  [4]:	Marcus Bridge
+  [5]:	The Bridge
+Albums: 
+  [1]:	Bridge Over Troubled Water
+  [2]:	Water Under the Bridge
+  [3]:	One Day Remains
+  [4]:	The Last Hero
+  [5]:	Blackbird
+Playlists: 
+  [1]:	Alter Bridge Complete Collection
+  [2]:	THE BRIDGE
+  [3]:	bridge
+  [4]:	Alter Bridge
+  [5]:	Bridge Anytime
+
+spotcon> play -t 2
+
+spotcon> current
+Track:  Under The Bridge
+Artist:	Red Hot Chili Peppers
+Album:	Blood Sugar Sex Magik (Deluxe Version)
+Volume: 100%
 ```
 
 
