@@ -17,7 +17,9 @@ Spotcon is a WIP command line interface, written in Go, that controls media play
 - Allow selection of devices using a search
   - i.e. `play Amazon Echo`
 - ~~Search for a playlist to listen to~~
+  - Display username of playlist creator next to playlist name
 - ~~Search for an album to listen to~~
+  - Display album artist(s) next to album name
 - ~~Search for a song to listen to~~
   - Play track/album/artist/playlist from most recent search
   - i.e. `play -t 2`
