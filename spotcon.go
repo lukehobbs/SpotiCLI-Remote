@@ -86,31 +86,37 @@ func main() {
 			Aliases: []string{"s"},
 			Flags: []cli.Flag{
 				cli.BoolFlag{
-					Name: "artist, ar",
+					Name:  "artist, ar",
 					Usage: "Search artists on Spotify",
 				},
 				cli.BoolFlag{
-					Name: "album, al",
+					Name:  "album, al",
 					Usage: "Search albums on Spotify",
 				},
 				cli.BoolFlag{
-					Name: "track, tr",
+					Name:  "track, tr",
 					Usage: "Search tracks on Spotify",
 				},
 				cli.BoolFlag{
-					Name: "playlist, pl",
+					Name:  "playlist, pl",
 					Usage: "Search playlists on Spotify",
 				},
 			},
-			Usage:   "Search Spotify for artists, albums, tracks, or playlists",
+			Usage: "Search Spotify for artists, albums, tracks, or playlists",
 			Action: func(c *cli.Context) error {
 				searchAction(c)
 				return nil
 			},
 		},
 		{
-			Name:      "play",
-			Aliases:   []string{"p"},
+			Name:    "play",
+			Aliases: []string{"p"},
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "device, d",
+					Usage: "Start/resume playback on specified device",
+				},
+			},
 			Usage:     "Start/Resume playback on device, or currently playing device if none specified",
 			ArgsUsage: "<device-id>",
 			Action: func(c *cli.Context) error {

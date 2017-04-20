@@ -292,25 +292,34 @@ func getVolume() int {
 
 func playAction(c *cli.Context) {
 	client := auth.NewClient(tok)
-	if c.Args().First() == "" {
+	x := c.String("device")
+	if x == "" {
 		err := client.Play()
 		checkErr(err)
 		return
 	}
-	i, err := strconv.Atoi(c.Args().First())
-	checkErr(err)
-
 	d, err := client.PlayerDevices()
 	checkErr(err)
-	if i > len(d) {
-		fmt.Println("ERROR: Incorrect device ID, ", i)
+	if xi, err := strconv.Atoi(x); err == nil {
+		if xi <= len(d) {
+			err = client.TransferPlayback(d[xi-1].ID, true)
+			checkErr(err)
+			return
+		}
+		fmt.Println("ERROR: Incorrect device ID, ", x)
 		err = cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
 	}
-
-	ID := d[i-1].ID
-	err = client.TransferPlayback(ID, true)
+	for _, v := range d {
+		if strings.Contains(strings.ToLower(v.Name), strings.ToLower(x)) {
+			err = client.TransferPlayback(v.ID, true)
+			checkErr(err)
+			return
+		}
+	}
+	fmt.Println("ERROR: Could not connect to device, ", x)
+	err = cli.ShowCommandHelp(c, c.Command.Name)
 	checkErr(err)
 }
 

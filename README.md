@@ -14,15 +14,14 @@ Spotcon is a WIP command line interface, written in Go, that controls media play
 - ~~Add an option to clear the console~~
 - ~~Change options (shuffle/repeat)~~
 - Seek options (fast forward, rewind)
-- Allow selection of devices using a search
-  - i.e. `play Amazon Echo`
+- ~~Allow selection of devices using a search~~
 - ~~Search for a playlist to listen to~~
   - Display username of playlist creator next to playlist name
 - ~~Search for an album to listen to~~
   - Display album artist(s) next to album name
 - ~~Search for a song to listen to~~
   - Play track/album/artist/playlist from most recent search
-  - i.e. `play -t 2`
+    - i.e. `play -t 2`
 
 ## Stretch Goals
 
@@ -36,17 +35,18 @@ Syntax: spotcon> command [subcommand] [arguments...]
 spotcon> devices                        List devices available for playback.
 
 spotcon> play                           Start/Resume playback on current device.
-spotcon> play <device_number>           Start/Resume playback on specified device.
+spotcon> play -device <number>          Start/Resume playback on specified device.
+spotcon> play -device <name>            Start/Resume playback on specified device.
 spotcon> pause                          Pause playback on current device.
 
 spotcon> search <query>                 Search Spotify for <query>
-spotcon> search --track <query>         Search Spotify tracks for <query>
-spotcon> search --album <query>         Search Spotify albums for <query>
-spotcon> search --artist <query>        Search Spotify artists for <query>
-spotcon> search --playlist <query>      Search Spotify playlists for <query>
+spotcon> search -track <query>          Search Spotify tracks for <query>
+spotcon> search -album <query>          Search Spotify albums for <query>
+spotcon> search -artist <query>         Search Spotify artists for <query>
+spotcon> search -playlist <query>       Search Spotify playlists for <query>
 
 spotcon> vol                            Show the current volume.
-spotcon> vol set <percent>              Set the volume to an amount between 0 and 100.
+spotcon> vol <percent>                  Set the volume to an amount between 0 and 100.
 spotcon> vol up                         Increase the volume by 10%.
 spotcon> vol down                       Decrease the volume by 10%.
 
@@ -75,7 +75,7 @@ spotcon> devices
 [2]=Desktop (Computer) ACTIVE
 [3]=Amazon Echo (Speaker)
 
-spotcon> play 3
+spotcon> play -device echo
 
 spotcon> devices
 [1]=Samsung (TV)
