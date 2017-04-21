@@ -259,12 +259,12 @@ func volDownAction(c *cli.Context) {
 }
 
 func volSetAction(c *cli.Context) {
-	if c.NArg() != 2 {
+	if c.NArg() != 1 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
 	}
-	i, err := strconv.Atoi(c.Args().Get(1))
+	i, err := strconv.Atoi(c.Args().First())
 	checkErr(err)
 	if i > 100 || i < 0 {
 		fmt.Println("ERROR: Invalid argument, ", i)

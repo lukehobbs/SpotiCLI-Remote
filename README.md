@@ -16,12 +16,12 @@ Spotcon is a WIP command line interface, written in Go, that controls media play
 - Seek options (fast forward, rewind)
 - ~~Allow selection of devices using a search~~
 - ~~Search for a playlist to listen to~~
-  - Display username of playlist creator next to playlist name
+  - ~~Display username of playlist creator next to playlist name~~
 - ~~Search for an album to listen to~~
-  - Display album artist(s) next to album name
+  - ~~Display album artist(s) next to album name~~
 - ~~Search for a song to listen to~~
-  - Play track/album/artist/playlist from most recent search
-    - i.e. `play -t 2`
+  - ~~Play track/album/artist/playlist from most recent search~~
+    - ~~i.e. `play -t 2`~~
 
 ## Stretch Goals
 
@@ -29,22 +29,36 @@ Spotcon is a WIP command line interface, written in Go, that controls media play
 
 ## Usage
 
-Syntax: spotcon> command [subcommand] [arguments...]
+Syntax: spotcon> command [subcommand] [--flags] [arguments...]
 
 ```
 spotcon> devices                        List devices available for playback.
 
 spotcon> play                           Start/Resume playback on current device.
-spotcon> play -device <number>          Start/Resume playback on specified device.
-spotcon> play -device <name>            Start/Resume playback on specified device.
-spotcon> play -track <track_name>       Play track with specified name.
+
+spotcon> play --device <number>          Start/Resume playback on specified device.
+spotcon> play --device <name>            Start/Resume playback on specified device.
+
+spotcon> play --track <name>             Play track with specified name.
+spotcon> play --album <name>             Play album with specified name.
+spotcon> play --artist <name>            Play artist with specified name.
+spotcon> play --playlist <name>          Play playlist with specified name.
+
 spotcon> pause                          Pause playback on current device.
 
 spotcon> search <query>                 Search Spotify for specified query.
-spotcon> search -track <query>          Search Spotify tracks for specified query.
-spotcon> search -album <query>          Search Spotify albums for specified query.
-spotcon> search -artist <query>         Search Spotify artists for specified query.
-spotcon> search -playlist <query>       Search Spotify playlists for specified query.
+
+spotcon> search --track <query>          Search Spotify tracks for specified query.
+spotcon> play --track <number>           Play track from last search with specified number.
+
+spotcon> search --album <query>          Search Spotify albums for specified query.
+spotcon> play --album <number>           Play album from last search with specified number.
+
+spotcon> search --artist <query>         Search Spotify artists for specified query.
+spotcon> play --artist <number>          Play artist from last search with specified number.
+
+spotcon> search --playlist <query>       Search Spotify playlists for specified query.
+spotcon> play --playlist <number>        Play playlist from last search with specified number.
 
 spotcon> vol                            Show the current volume.
 spotcon> vol <percent>                  Set the volume to an amount between 0 and 100.
@@ -76,14 +90,14 @@ spotcon> devices
 [2]=Desktop (Computer) ACTIVE
 [3]=Amazon Echo (Speaker)
 
-spotcon> play -device echo
+spotcon> play --device echo
 
 spotcon> devices
 [1]=Samsung (TV)
 [2]=Desktop (Computer)
 [3]=Amazon Echo (Speaker) ACTIVE
 
-spotcon> vol set 80
+spotcon> vol 80
 spotcon> vol
 Volume: 80%
 
@@ -121,19 +135,19 @@ Artists:
   [4]:	Marcus Bridge
   [5]:	The Bridge
 Albums: 
-  [1]:	Bridge Over Troubled Water
-  [2]:	Water Under the Bridge
-  [3]:	One Day Remains
-  [4]:	The Last Hero
-  [5]:	Blackbird
+  [1]:	"Bridge Over Troubled Water" by Simon & Garfunkel
+  [2]:	"Water Under the Bridge" by Adele
+  [3]:	"One Day Remains" by Alter Bridge
+  [4]:	"The Last Hero" by Alter Bridge
+  [5]:	"Blackbird" by Alter Bridge
 Playlists: 
-  [1]:	Alter Bridge Complete Collection
-  [2]:	THE BRIDGE
-  [3]:	bridge
-  [4]:	Alter Bridge
-  [5]:	Bridge Anytime
+  [1]:	"Alter Bridge Complete Collection" - officialalterbridge
+  [2]:	"THE BRIDGE" - 1221493509
+  [3]:	"bridge" - 11101296551
+  [4]:	"Alter Bridge" - chemistry11
+  [5]:	"Bridge Anytime" - 1259523134
 
-spotcon> play -t 2
+spotcon> play --track 2
 
 spotcon> current
 Track:  Under The Bridge

@@ -154,7 +154,7 @@ func main() {
 			Name:      "vol",
 			Aliases:   []string{"v"},
 			Usage:     "Options for changing volume on currently playing device",
-			ArgsUsage: "[up | down | set] <percent>",
+			ArgsUsage: "[up | down | <percent>]",
 			Action: func(c *cli.Context) error {
 				if c.Args().First() == "up" {
 					volUpAction(c)
@@ -164,7 +164,7 @@ func main() {
 					volDownAction(c)
 					return nil
 				}
-				if c.Args().First() == "set" {
+				if c.NArg() > 0 {
 					volSetAction(c)
 					return nil
 				}
