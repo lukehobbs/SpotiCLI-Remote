@@ -134,7 +134,6 @@ func main() {
 				},
 			},
 			Usage:     "Start/Resume playback on device, or currently playing device if none specified",
-			ArgsUsage: "<device-id>",
 			Action: func(c *cli.Context) error {
 				playAction(c)
 				return nil

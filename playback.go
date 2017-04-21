@@ -12,7 +12,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-var LastSearch *spotify.SearchResult
+var LastSearch *spotify.SearchResult	// Stores the results of the last search performed
 
 func searchAction(c *cli.Context) {
 	var t int
@@ -291,73 +291,104 @@ func getVolume() int {
 }
 
 func playAction(c *cli.Context) {
-	client := auth.NewClient(tok)
-	x := c.String("device")
-	var tr []spotify.URI
-	var o spotify.PlayOptions
-
-	if c.Bool("track") {
-		t := strings.Join(c.Args(), " ")
-		fmt.Println("t = ", t)
-		tr = luckySearchTrack(t)
-		o = spotify.PlayOptions{URIs:tr}
+	if c.NumFlags() > 4 {
+		fmt.Println("ERROR: Too many flags set.")
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
 	}
-
-	if x == "" {
-		if tr == nil {
+	client := auth.NewClient(tok)
+	if c.NumFlags() == 0 {
+		err := client.Play()
+		checkErr(err)
+		return
+	}
+	if c.IsSet("device") {
+		fmt.Println("Settings device... ",c.String("device"))
+		e := setDevice(c.String("device"))
+		if e != true {
+			err := cli.ShowCommandHelp(c, c.Command.Name)
+			checkErr(err)
+			return
+		}
+		if c.NumFlags() == 1 {	// Device is the only flag set.
+			fmt.Println("Device is only flag. Playing...")
 			err := client.Play()
 			checkErr(err)
 			return
 		}
+	}
+	if c.IsSet("track") {
+		playTrack(c.Args())
+		return
+	}
+	if c.IsSet("album") {
+
+	}
+	if c.IsSet("artist") {
+
+	}
+	if c.IsSet("plist") {
+
+	}
+}
+
+func setDevice(s string) bool {
+	client := auth.NewClient(tok)
+	d, err := client.PlayerDevices()
+	checkErr(err)
+
+	if xi, err := strconv.Atoi(s); err == nil {
+		if xi > 0 && xi <= len(d) {
+			err = client.Pause()	// Pause playback before transfer.
+			checkErr(err)
+			err = client.TransferPlayback(d[xi-1].ID, false)
+			checkErr(err)
+			return true
+		}
+		fmt.Println("ERROR: Incorrect device ID, ", s)
+		return false
+	}
+
+	for _, v := range d {
+		if strings.Contains(strings.ToLower(v.Name), strings.ToLower(s)) {
+			err = client.Pause()	// Pause playback before transfer.
+			checkErr(err)
+			err = client.TransferPlayback(v.ID, false)
+			checkErr(err)
+			return true
+		}
+	}
+
+	fmt.Println("ERROR: Could not connect to device, ", s)
+	checkErr(err)
+	return false
+}
+
+func playTrack(s []string) {
+	client := auth.NewClient(tok)
+	t := strings.Join(s, " ")
+	if i, err := strconv.Atoi(t); err == nil {
+		playTrackNum(i)
+		return
+	}
+	u := luckySearchTrack(t)
+	o := spotify.PlayOptions{URIs:u}
+	err := client.PlayOpt(&o)
+	checkErr(err)
+}
+
+func playTrackNum(i int) {
+	client := auth.NewClient(tok)
+	lt := LastSearch.Tracks.Tracks
+	if i > 0 && i < len(lt) {
+		t := lt[i-1]
+		o := spotify.PlayOptions{URIs:[]spotify.URI{t.URI}}
 		err := client.PlayOpt(&o)
 		checkErr(err)
 		return
 	}
-
-	d, err := client.PlayerDevices()
-	checkErr(err)
-
-	if xi, err := strconv.Atoi(x); err == nil {
-		if xi <= len(d) {
-			err = client.TransferPlayback(d[xi-1].ID, true)
-			checkErr(err)
-			if tr == nil {
-				return
-			}
-			err := client.PlayOpt(&o)
-			checkErr(err)
-			return
-		}
-		fmt.Println("ERROR: Incorrect device ID, ", x)
-		err = cli.ShowCommandHelp(c, c.Command.Name)
-		checkErr(err)
-		return
-	}
-
-	for _, v := range d {
-		if strings.Contains(strings.ToLower(v.Name), strings.ToLower(x)) {
-			err = client.TransferPlayback(v.ID, true)
-			checkErr(err)
-			if tr == nil {
-				return
-			}
-			err := client.PlayOpt(&o)
-			checkErr(err)
-			return
-		}
-	}
-
-	fmt.Println("ERROR: Could not connect to device, ", x)
-	err = cli.ShowCommandHelp(c, c.Command.Name)
-	checkErr(err)
-}
-
-func playTrack(s string) {
-
-}
-
-func playTrackNum(i int) {
-
+	return
 }
 
 func playArtist(s string) {
@@ -382,6 +413,7 @@ func playPlaylist(s string) {
 func playPlaylistNum(i int) {
 
 }
+
 func luckySearchTrack(s string) []spotify.URI {
 	if s == "" {
 		return nil
