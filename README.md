@@ -35,7 +35,7 @@ Syntax: spotcon> command [subcommand] [--flags] [arguments...]
 COMMANDS:
      clear,   clc  Clear the command window
      current, c    Display information about the current playback
-     devices, d    List available devices and their IDs
+     devices, d    List available devices and their numbers
      next,    n    Skip to the next track in queue
      options, o    Display current playback options
      pause,   pp   Pause playback on currently playing device

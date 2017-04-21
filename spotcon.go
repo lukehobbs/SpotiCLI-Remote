@@ -77,7 +77,7 @@ func main() {
 		{
 			Name:    "devices",
 			Aliases: []string{"d"},
-			Usage:   "List available devices and their IDs",
+			Usage:   "List available devices and their numbers",
 			Action: func(c *cli.Context) error {
 				devicesAction(c)
 				return nil
