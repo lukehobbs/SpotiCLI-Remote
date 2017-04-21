@@ -293,16 +293,38 @@ func getVolume() int {
 func playAction(c *cli.Context) {
 	client := auth.NewClient(tok)
 	x := c.String("device")
+	var tr []spotify.URI
+	var o spotify.PlayOptions
+
+	if c.Bool("track") {
+		t := strings.Join(c.Args(), " ")
+		fmt.Println("t = ", t)
+		tr = luckySearchTrack(t)
+		o = spotify.PlayOptions{URIs:tr}
+	}
+
 	if x == "" {
-		err := client.Play()
+		if tr == nil {
+			err := client.Play()
+			checkErr(err)
+			return
+		}
+		err := client.PlayOpt(&o)
 		checkErr(err)
 		return
 	}
+
 	d, err := client.PlayerDevices()
 	checkErr(err)
+
 	if xi, err := strconv.Atoi(x); err == nil {
 		if xi <= len(d) {
 			err = client.TransferPlayback(d[xi-1].ID, true)
+			checkErr(err)
+			if tr == nil {
+				return
+			}
+			err := client.PlayOpt(&o)
 			checkErr(err)
 			return
 		}
@@ -311,16 +333,63 @@ func playAction(c *cli.Context) {
 		checkErr(err)
 		return
 	}
+
 	for _, v := range d {
 		if strings.Contains(strings.ToLower(v.Name), strings.ToLower(x)) {
 			err = client.TransferPlayback(v.ID, true)
 			checkErr(err)
+			if tr == nil {
+				return
+			}
+			err := client.PlayOpt(&o)
+			checkErr(err)
 			return
 		}
 	}
+
 	fmt.Println("ERROR: Could not connect to device, ", x)
 	err = cli.ShowCommandHelp(c, c.Command.Name)
 	checkErr(err)
+}
+
+func playTrack(s string) {
+
+}
+
+func playTrackNum(i int) {
+
+}
+
+func playArtist(s string) {
+
+}
+
+func playArtistNum(i int) {
+
+}
+
+func playAlbum(s string) {
+
+}
+
+func playAlbumNum(i int) {
+
+}
+func playPlaylist(s string) {
+
+}
+
+func playPlaylistNum(i int) {
+
+}
+func luckySearchTrack(s string) []spotify.URI {
+	if s == "" {
+		return nil
+	}
+	client := auth.NewClient(tok)
+	r, err := client.Search(s, spotify.SearchType(8))
+	checkErr(err)
+	return []spotify.URI{r.Tracks.Tracks[0].URI}
 }
 
 func pauseAction(c *cli.Context) {

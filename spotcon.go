@@ -116,6 +116,22 @@ func main() {
 					Name:  "device, d",
 					Usage: "Start/resume playback on specified device",
 				},
+				cli.BoolFlag{
+					Name: "track, t",
+					Usage: "Play track with specified name.",
+				},
+				cli.BoolFlag{
+					Name: "album, al",
+					Usage: "Play album with specified name.",
+				},
+				cli.BoolFlag{
+					Name: "artist, ar",
+					Usage: "Play artist with specified name.",
+				},
+				cli.BoolFlag{
+					Name: "plist, p",
+					Usage: "Play playlist with specified name",
+				},
 			},
 			Usage:     "Start/Resume playback on device, or currently playing device if none specified",
 			ArgsUsage: "<device-id>",

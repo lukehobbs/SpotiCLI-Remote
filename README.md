@@ -37,13 +37,14 @@ spotcon> devices                        List devices available for playback.
 spotcon> play                           Start/Resume playback on current device.
 spotcon> play -device <number>          Start/Resume playback on specified device.
 spotcon> play -device <name>            Start/Resume playback on specified device.
+spotcon> play -track <track_name>       Play track with specified name.
 spotcon> pause                          Pause playback on current device.
 
-spotcon> search <query>                 Search Spotify for <query>
-spotcon> search -track <query>          Search Spotify tracks for <query>
-spotcon> search -album <query>          Search Spotify albums for <query>
-spotcon> search -artist <query>         Search Spotify artists for <query>
-spotcon> search -playlist <query>       Search Spotify playlists for <query>
+spotcon> search <query>                 Search Spotify for specified query.
+spotcon> search -track <query>          Search Spotify tracks for specified query.
+spotcon> search -album <query>          Search Spotify albums for specified query.
+spotcon> search -artist <query>         Search Spotify artists for specified query.
+spotcon> search -playlist <query>       Search Spotify playlists for specified query.
 
 spotcon> vol                            Show the current volume.
 spotcon> vol <percent>                  Set the volume to an amount between 0 and 100.
