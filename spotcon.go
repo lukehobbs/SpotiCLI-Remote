@@ -71,7 +71,7 @@ func main() {
 		},
 	}
 	app.Usage = "Control Spotify Connect enabled devices via terminal."
-	app.UsageText = "spotify> command [subcommand] [arguments...]"
+	app.UsageText = "spotify> command [subcommand] [--flags] [arguments...]"
 
 	app.Commands = []cli.Command{
 		{
@@ -89,19 +89,19 @@ func main() {
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "artist, ar",
-					Usage: "Search artists on Spotify",
+					Usage: "Search for artist, `NAME`, on Spotify",
 				},
 				cli.BoolFlag{
 					Name:  "album, al",
-					Usage: "Search albums on Spotify",
+					Usage: "Search albums, `NAME`, on Spotify",
 				},
 				cli.BoolFlag{
 					Name:  "track, tr",
-					Usage: "Search tracks on Spotify",
+					Usage: "Search tracks, `NAME`, on Spotify",
 				},
 				cli.BoolFlag{
 					Name:  "playlist, pl",
-					Usage: "Search playlists on Spotify",
+					Usage: "Search playlists, `NAME`, on Spotify",
 				},
 			},
 			Usage: "Search Spotify for artists, albums, tracks, or playlists",
@@ -116,23 +116,23 @@ func main() {
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "device, d",
-					Usage: "Start/resume playback on specified device",
+					Usage: "Start/resume playback on specified  `NAME` or number from device list",
 				},
 				cli.BoolFlag{
-					Name: "track, t",
-					Usage: "Play track with specified name.",
+					Name: "track, tr",
+					Usage: "Play track with specified `NAME` or number from search results",
 				},
 				cli.BoolFlag{
 					Name: "album, al",
-					Usage: "Play album with specified name.",
+					Usage: "Play album with specified `NAME` or number from search results",
 				},
 				cli.BoolFlag{
 					Name: "artist, ar",
-					Usage: "Play artist with specified name.",
+					Usage: "Play artist with specified `NAME` or number from search results",
 				},
 				cli.BoolFlag{
 					Name: "plist, pl",
-					Usage: "Play playlist with specified name",
+					Usage: "Play playlist with specified `NAME` or number from search results",
 				},
 			},
 			Usage:     "Start/Resume playback on device, or currently playing device if none specified",
@@ -154,7 +154,7 @@ func main() {
 			Name:      "vol",
 			Aliases:   []string{"v"},
 			Usage:     "Options for changing volume on currently playing device",
-			ArgsUsage: "[up | down | <percent>]",
+			ArgsUsage: "[up, down, PERCENT]",
 			Action: func(c *cli.Context) error {
 				if c.Args().First() == "up" {
 					volUpAction(c)
@@ -210,7 +210,7 @@ func main() {
 		},
 		{
 			Name:    "shuffle",
-			Aliases: []string{"s"},
+			Aliases: []string{"sh"},
 			Usage:   "Toggle playback option shuffle",
 			Action: func(c *cli.Context) error {
 				shuffleAction(c)

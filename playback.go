@@ -467,6 +467,7 @@ func playAlbumNum(i int) {
 	}
 	return
 }
+
 func playPlaylist(s []string) {
 	client := auth.NewClient(tok)
 	t := strings.Join(s, " ")

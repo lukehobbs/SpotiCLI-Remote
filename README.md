@@ -32,52 +32,36 @@ Spotcon is a WIP command line interface, written in Go, that controls media play
 Syntax: spotcon> command [subcommand] [--flags] [arguments...]
 
 ```
-spotcon> devices                        List devices available for playback.
+COMMANDS:
+     clear,   clc  Clear the command window
+     current, c    Display information about the current playback
+     devices, d    List available devices and their IDs
+     next,    n    Skip to the next track in queue
+     options, o    Display current playback options
+     pause,   pp   Pause playback on currently playing device
+     play,    p    Start/Resume playback on device, or currently playing device if none specified
+        --device DEVICE, -d  DEVICE  Start/resume playback on specified  DEVICE or number from device list
+        --track  NAME,  --tr NAME    Play track with specified NAME or number from search results
+        --album  NAME,  --al NAME    Play album with specified NAME or number from search results
+        --artist NAME,  --ar NAME    Play artist with specified NAME or number from search results
+        --plist  NAME,  --pl NAME    Play playlist with specified NAME or number from search results
+     prev,    pr   Skip to the previous track in queue
+     quit,    q    Quit application
+     repeat,  r    turn on playlist option repeat
+        [off, track, playlist] 
+     search,  s    Search Spotify for artists, albums, tracks, or playlists
+        --artist   NAME, --ar NAME   Search for artist, NAME, on Spotify
+        --album    NAME, --al NAME   Search albums, NAME, on Spotify
+        --track    NAME, --tr NAME   Search tracks, NAME, on Spotify
+        --playlist NAME, --pl NAME   Search playlists, NAME, on Spotify
+     shuffle, sh   Toggle playback option shuffle
+     vol,     v    Options for changing volume on currently playing device
+        [up, down, PERCENT]        
+     help,    h    Shows a list of commands or help for one command
 
-spotcon> play                           Start/Resume playback on current device.
-
-spotcon> play --device <number>          Start/Resume playback on specified device.
-spotcon> play --device <name>            Start/Resume playback on specified device.
-
-spotcon> play --track <name>             Play track with specified name.
-spotcon> play --album <name>             Play album with specified name.
-spotcon> play --artist <name>            Play artist with specified name.
-spotcon> play --playlist <name>          Play playlist with specified name.
-
-spotcon> pause                          Pause playback on current device.
-
-spotcon> search <query>                 Search Spotify for specified query.
-
-spotcon> search --track <query>          Search Spotify tracks for specified query.
-spotcon> play --track <number>           Play track from last search with specified number.
-
-spotcon> search --album <query>          Search Spotify albums for specified query.
-spotcon> play --album <number>           Play album from last search with specified number.
-
-spotcon> search --artist <query>         Search Spotify artists for specified query.
-spotcon> play --artist <number>          Play artist from last search with specified number.
-
-spotcon> search --playlist <query>       Search Spotify playlists for specified query.
-spotcon> play --playlist <number>        Play playlist from last search with specified number.
-
-spotcon> vol                            Show the current volume.
-spotcon> vol <percent>                  Set the volume to an amount between 0 and 100.
-spotcon> vol up                         Increase the volume by 10%.
-spotcon> vol down                       Decrease the volume by 10%.
-
-spotcon> next                           Skip to the next song in playlist.
-spotcon> prev                           Return to the previous song in playlist.
-spotcon> current                        Show information about the currently playing song.
-
-spotcon> options                        Display current state of playback options (Shuffle, Repeat, Volume)
-spotcon> shuffle                        Toggle shuffle playback state
-spotcon> repeat track                   Turn on track repeat playback
-spotcon> repeat playlist                Turn on playlist repeat playback
-spotcon> repeat off                     Turn repeat playback off
-
-spotcon> clear                          Clear the command window.
-spotcon> help                           Show help.
-spotcon> quit                           Quit application.
+GLOBAL OPTIONS:
+   --help, -h     show help
+   --version, -v  print the version
 ```
 
 ## Example
