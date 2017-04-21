@@ -24,6 +24,8 @@ Album:	{{.Album.Name}}
 `
 const shortTrackTemplate = `"{{.Name}}" by {{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
 `
+const shortAlbumTemplate = `"{{.Name}}" by {{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
+`
 const optionsTemplate = `Shuffle: {{if .ShuffleState}}on{{end}}{{if not .ShuffleState}}off{{end}}
 Repeat: {{.RepeatState}}
 `
@@ -129,7 +131,7 @@ func main() {
 					Usage: "Play artist with specified name.",
 				},
 				cli.BoolFlag{
-					Name: "plist, p",
+					Name: "plist, pl",
 					Usage: "Play playlist with specified name",
 				},
 			},
