@@ -22,6 +22,7 @@ Spotcon is a WIP command line interface, written in Go, that controls media play
 - ~~Search for a song to listen to~~
   - ~~Play track/album/artist/playlist from most recent search~~
 - Search should be prioritized to search user's saved library first
+- Move repeat and shuffle commands to be flags of options command
 
 ## Stretch Goals
 
@@ -50,10 +51,10 @@ COMMANDS:
      repeat,  r    turn on playlist option repeat
         [off, track, playlist] 
      search,  s    Search Spotify for artists, albums, tracks, or playlists
-        --artist   NAME, --ar NAME   Search for artist, NAME, on Spotify
-        --album    NAME, --al NAME   Search albums, NAME, on Spotify
-        --track    NAME, --tr NAME   Search tracks, NAME, on Spotify
-        --playlist NAME, --pl NAME   Search playlists, NAME, on Spotify
+        --artist NAME,  --ar NAME    Search for artist, NAME, on Spotify
+        --album  NAME,  --al NAME    Search albums, NAME, on Spotify
+        --track  NAME,  --tr NAME    Search tracks, NAME, on Spotify
+        --plist  NAME,  --pl NAME    Search playlists, NAME, on Spotify
      shuffle, sh   Toggle playback option shuffle
      vol,     v    Options for changing volume on currently playing device
         [up, down, PERCENT]        
@@ -70,16 +71,18 @@ GLOBAL OPTIONS:
 $ spotcon
 You are logged in as: lukehobbs
 spotcon> devices
-[1]=Samsung (TV)
-[2]=Desktop (Computer) ACTIVE
-[3]=Amazon Echo (Speaker)
+Devices:
+  [1]: Samsung (TV)
+  [2]: Desktop (Computer) ACTIVE
+  [3]: Amazon Echo (Speaker)
 
 spotcon> play --device echo
 
 spotcon> devices
-[1]=Samsung (TV)
-[2]=Desktop (Computer)
-[3]=Amazon Echo (Speaker) ACTIVE
+Devices:
+  [1]: Samsung (TV)
+  [2]: Desktop (Computer)
+  [3]: Amazon Echo (Speaker) ACTIVE
 
 spotcon> vol 80
 spotcon> vol
@@ -93,11 +96,11 @@ spotcon> current
 Track:  Shut Up
 Artist:	blink-182
 Album:	Take Off Your Pants And Jacket
+Volume: 90%
 
 spotcon> options
 Shuffle: On
 Repeat:  Off
-Volume:  90%
 
 spotcon> repeat track
 Repeat:  track
@@ -137,7 +140,7 @@ spotcon> current
 Track:  Under The Bridge
 Artist:	Red Hot Chili Peppers
 Album:	Blood Sugar Sex Magik (Deluxe Version)
-Volume: 100%
+Volume: 90%
 ```
 
 

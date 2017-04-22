@@ -577,8 +577,9 @@ func devicesAction(c *cli.Context) {
 	client := auth.NewClient(tok)
 	d, err := client.PlayerDevices()
 	checkErr(err)
+	fmt.Println("Devices:")
 	for i, v := range d {
-		fmt.Printf("[%d]=%v (%v)", i+1, v.Name, v.Type)
+		fmt.Printf("  [%d]: %v (%v)", i+1, v.Name, v.Type)
 		if v.Active {
 			fmt.Println(" ACTIVE")
 		} else {
