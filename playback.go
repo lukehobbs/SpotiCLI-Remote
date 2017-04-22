@@ -4,15 +4,16 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"text/template"
 	"time"
-	"strings"
 
-	"github.com/zmb3/spotify"
 	"github.com/urfave/cli"
+	"github.com/zmb3/spotify"
 )
 
-var LastSearch *spotify.SearchResult	// Stores the results of the last search performed
+// LastSearch is the results of the last search query
+var LastSearch *spotify.SearchResult
 
 func searchAction(c *cli.Context) {
 	var t int
@@ -22,16 +23,16 @@ func searchAction(c *cli.Context) {
 		displayLastSearch()
 		return
 	}
-	if c.Bool("album"){
-		t += 1
+	if c.Bool("album") {
+		t++
 	}
-	if c.Bool("artist"){
+	if c.Bool("artist") {
 		t += 2
 	}
-	if c.Bool("playlist"){
+	if c.Bool("playlist") {
 		t += 4
 	}
-	if c.Bool("track"){
+	if c.Bool("track") {
 		t += 8
 	}
 	if t == 0 {
@@ -52,16 +53,14 @@ func displayLastSearch() {
 	displaySearchResults(LastSearch)
 }
 
-func displaySearchResults(r *spotify.SearchResult){
+func displaySearchResults(r *spotify.SearchResult) {
 	if r.Tracks != nil {
 		fmt.Println("Tracks: ")
 		t := template.New("shortTrackTemplate")
 		t, err := t.Parse(shortTrackTemplate)
 		checkErr(err)
-		for i, v := range r.Tracks.Tracks{
-			if i > 4 {
-				break
-			}
+		for i := 0; i < 5; i++ {
+			v := r.Tracks.Tracks[i]
 			fmt.Printf("  [%d]:\t", i+1)
 			err = t.Execute(os.Stdout, v)
 			checkErr(err)
@@ -69,10 +68,8 @@ func displaySearchResults(r *spotify.SearchResult){
 	}
 	if r.Artists != nil {
 		fmt.Println("Artists: ")
-		for i, v := range r.Artists.Artists {
-			if i > 4 {
-				break
-			}
+		for i := 0; i < 5; i++ {
+			v := r.Artists.Artists[i]
 			fmt.Printf("  [%d]:\t%v\n", i+1, v.Name)
 		}
 	}
@@ -82,22 +79,19 @@ func displaySearchResults(r *spotify.SearchResult){
 		t := template.New("shortAlbumTemplate")
 		t, err := t.Parse(shortAlbumTemplate)
 		checkErr(err)
-		for i, v := range r.Albums.Albums {
-			if i > 4 {
-				break
-			}
+		for i := 0; i < 5; i++ {
+			v := r.Albums.Albums[i]
 			a, err := client.GetAlbum(v.ID)
 			checkErr(err)
 			fmt.Printf("  [%d]:\t", i+1)
 			err = t.Execute(os.Stdout, a)
+			checkErr(err)
 		}
 	}
 	if r.Playlists != nil {
 		fmt.Println("Playlists: ")
-		for i, v := range r.Playlists.Playlists {
-			if i > 4 {
-				break
-			}
+		for i := 0; i < 5; i++ {
+			v := r.Playlists.Playlists[i]
 			fmt.Printf("  [%d]:\t\"%v\" - %s\n", i+1, v.Name, v.Owner.ID)
 		}
 	}
@@ -312,14 +306,14 @@ func playAction(c *cli.Context) {
 		return
 	}
 	if c.IsSet("device") {
-		fmt.Println("Settings device... ",c.String("device"))
+		fmt.Println("Settings device... ", c.String("device"))
 		e := setDevice(c.String("device"))
-		if e != true {
+		if !e {
 			err := cli.ShowCommandHelp(c, c.Command.Name)
 			checkErr(err)
 			return
 		}
-		if c.NumFlags() == 1 {	// Device is the only flag set.
+		if c.NumFlags() == 1 { // Device is the only flag set.
 			fmt.Println("Device is only flag. Playing...")
 			err := client.Play()
 			checkErr(err)
@@ -345,10 +339,10 @@ func setDevice(s string) bool {
 	client := auth.NewClient(tok)
 	d, err := client.PlayerDevices()
 	checkErr(err)
-
-	if xi, err := strconv.Atoi(s); err == nil {
+	var xi int
+	if xi, err = strconv.Atoi(s); err == nil {
 		if xi > 0 && xi <= len(d) {
-			err = client.Pause()	// Pause playback before transfer.
+			err = client.Pause() // Pause playback before transfer.
 			checkErr(err)
 			err = client.TransferPlayback(d[xi-1].ID, false)
 			checkErr(err)
@@ -360,7 +354,7 @@ func setDevice(s string) bool {
 
 	for _, v := range d {
 		if strings.Contains(strings.ToLower(v.Name), strings.ToLower(s)) {
-			err = client.Pause()	// Pause playback before transfer.
+			err = client.Pause() // Pause playback before transfer.
 			checkErr(err)
 			err = client.TransferPlayback(v.ID, false)
 			checkErr(err)
@@ -381,7 +375,7 @@ func playTrack(s []string) {
 		return
 	}
 	u := luckySearchTrack(t)
-	o := spotify.PlayOptions{URIs:u}
+	o := spotify.PlayOptions{URIs: u}
 	err := client.PlayOpt(&o)
 	checkErr(err)
 }
@@ -395,7 +389,7 @@ func playTrackNum(i int) {
 	}
 	if i > 0 && i < len(r) {
 		t := r[i-1]
-		o := spotify.PlayOptions{URIs:[]spotify.URI{t.URI}}
+		o := spotify.PlayOptions{URIs: []spotify.URI{t.URI}}
 		err := client.PlayOpt(&o)
 		checkErr(err)
 		return
@@ -428,7 +422,7 @@ func playArtistNum(i int) {
 	}
 	if i > 0 && i < len(r) {
 		t := r[i-1]
-		o := spotify.PlayOptions{PlaybackContext:&t.URI}
+		o := spotify.PlayOptions{PlaybackContext: &t.URI}
 		err := client.PlayOpt(&o)
 		checkErr(err)
 		return
@@ -461,7 +455,7 @@ func playAlbumNum(i int) {
 	}
 	if i > 0 && i < len(r) {
 		t := r[i-1]
-		o := spotify.PlayOptions{PlaybackContext:&t.URI}
+		o := spotify.PlayOptions{PlaybackContext: &t.URI}
 		err := client.PlayOpt(&o)
 		checkErr(err)
 		return
@@ -494,7 +488,7 @@ func playPlaylistNum(i int) {
 	}
 	if i > 0 && i < len(r) {
 		t := r[i-1]
-		o := spotify.PlayOptions{PlaybackContext:&t.URI}
+		o := spotify.PlayOptions{PlaybackContext: &t.URI}
 		err := client.PlayOpt(&o)
 		checkErr(err)
 		return
@@ -516,7 +510,7 @@ func luckySearchTrack(s string) []spotify.URI {
 	return []spotify.URI{r.Tracks.Tracks[0].URI}
 }
 
-func luckySearchArtist(s string) spotify.URI{
+func luckySearchArtist(s string) spotify.URI {
 	if s == "" {
 		return ""
 	}

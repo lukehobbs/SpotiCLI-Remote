@@ -119,23 +119,23 @@ func main() {
 					Usage: "Start/resume playback on specified  `NAME` or number from device list",
 				},
 				cli.BoolFlag{
-					Name: "track, tr",
+					Name:  "track, tr",
 					Usage: "Play track with specified `NAME` or number from search results",
 				},
 				cli.BoolFlag{
-					Name: "album, al",
+					Name:  "album, al",
 					Usage: "Play album with specified `NAME` or number from search results",
 				},
 				cli.BoolFlag{
-					Name: "artist, ar",
+					Name:  "artist, ar",
 					Usage: "Play artist with specified `NAME` or number from search results",
 				},
 				cli.BoolFlag{
-					Name: "plist, pl",
+					Name:  "plist, pl",
 					Usage: "Play playlist with specified `NAME` or number from search results",
 				},
 			},
-			Usage:     "Start/Resume playback on device, or currently playing device if none specified",
+			Usage: "Start/Resume playback on device, or currently playing device if none specified",
 			Action: func(c *cli.Context) error {
 				playAction(c)
 				return nil
