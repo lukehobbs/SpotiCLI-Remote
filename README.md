@@ -2,32 +2,6 @@
 
 Spotcon is a WIP command line interface, written in Go, that controls media playback over spotify connected devices using the [Spotify Web API](https://api.spotify.com).
 
-## Todo
-
-- ~~Control media playback (pause/play, next/previous song)~~
-- ~~Login to Spotify through WebAPI~~
-- ~~Store OAuth 2 Token in user's home directory to avoid having to login every run~~
-- ~~Control volume of media playback~~
-- ~~Get information about currently playing song~~
-- ~~Control device selection~~
-- ~~Skip track (next/previous song)~~
-- ~~Add an option to clear the console~~
-- ~~Change options (shuffle/repeat)~~
-- Seek options (fast forward, rewind)
-- ~~Allow selection of devices using a search~~
-- ~~Search for a playlist to listen to~~
-  - ~~Display username of playlist creator next to playlist name~~
-- ~~Search for an album to listen to~~
-  - ~~Display album artist(s) next to album name~~
-- ~~Search for a song to listen to~~
-  - ~~Play track/album/artist/playlist from most recent search~~
-- Search should be prioritized to search user's saved library first
-- Move repeat and shuffle commands to be flags of options command
-
-## Stretch Goals
-
-- Daemon to monitor and report currently playing media in plain text for scripting purposes (polybar, conky, etc.)
-
 ## Usage
 
 Syntax: spotcon> command [subcommand] [--flags] [arguments...]
@@ -65,6 +39,32 @@ GLOBAL OPTIONS:
    --version, -v  print the version
 ```
 
+## Todo
+
+- ~~Control media playback (pause/play, next/previous song)~~
+- ~~Login to Spotify through WebAPI~~
+- ~~Store OAuth 2 Token in user's home directory to avoid having to login every run~~
+- ~~Control volume of media playback~~
+- ~~Get information about currently playing song~~
+- ~~Control device selection~~
+- ~~Skip track (next/previous song)~~
+- ~~Add an option to clear the console~~
+- ~~Change options (shuffle/repeat)~~
+- Seek options (fast forward, rewind)
+- ~~Allow selection of devices using a search~~
+- ~~Search for a playlist to listen to~~
+  - ~~Display username of playlist creator next to playlist name~~
+- ~~Search for an album to listen to~~
+  - ~~Display album artist(s) next to album name~~
+- ~~Search for a song to listen to~~
+  - ~~Play track/album/artist/playlist from most recent search~~
+- Search should be prioritized to search user's saved library first
+- Move repeat and shuffle commands to be flags of options command
+
+## Stretch Goals
+
+- Daemon to monitor and report currently playing media in plain text for scripting purposes (polybar, conky, etc.)
+
 ## Example
 
 ```
@@ -76,7 +76,7 @@ Devices:
   [2]: Desktop (Computer) ACTIVE
   [3]: Amazon Echo (Speaker)
 
-spotcon> play --device echo
+spotcon> play --device echo --track shut up blink
 
 spotcon> devices
 Devices:

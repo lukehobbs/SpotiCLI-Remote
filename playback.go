@@ -103,6 +103,7 @@ func displaySearchResults(r *spotify.SearchResult){
 	}
 
 }
+
 func repeatAction(c *cli.Context) {
 	if c.NArg() < 1 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
