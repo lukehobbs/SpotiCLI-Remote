@@ -85,11 +85,9 @@ Devices:
   [3]: Amazon Echo (Speaker) ACTIVE
 
 spotcon> vol 80
-spotcon> vol
 Volume: 80%
 
 spotcon> vol up
-spotcon> vol
 Volume: 90%
 
 spotcon> current
