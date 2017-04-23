@@ -27,7 +27,7 @@ const shortTrackTemplate = `"{{.Name}}" by {{range $index, $artist := .Artists}}
 const shortAlbumTemplate = `"{{.Name}}" by {{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
 `
 const optionsTemplate = `Shuffle: {{if .ShuffleState}}on{{end}}{{if not .ShuffleState}}off{{end}}
-Repeat: {{.RepeatState}}
+Repeat:  {{.RepeatState}}
 `
 
 var (
@@ -154,7 +154,7 @@ func main() {
 			Name:      "vol",
 			Aliases:   []string{"v"},
 			Usage:     "Options for changing volume on currently playing device",
-			ArgsUsage: "[up, down, PERCENT]",
+			//ArgsUsage: "[up, down, PERCENT]",
 			Action: func(c *cli.Context) error {
 				if c.Args().First() == "up" {
 					volAction(c, true)
@@ -209,30 +209,21 @@ func main() {
 			},
 		},
 		{
-			Name:    "shuffle",
-			Aliases: []string{"sh"},
-			Usage:   "Toggle playback option shuffle",
-			Action: func(c *cli.Context) error {
-				shuffleAction(c)
-				return nil
-			},
-		},
-		{
-			Name:      "repeat",
-			Aliases:   []string{"r"},
-			Usage:     "turn on playlist option repeat",
-			ArgsUsage: "[off | track | playlist]",
-			Action: func(c *cli.Context) error {
-				repeatAction(c)
-				return nil
-			},
-		},
-		{
-			Name:    "options",
+			Name:    "opt",
 			Aliases: []string{"o"},
-			Usage:   "Display current playback options",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "repeat, r",
+					Usage: "Set playback option repeat [on, off]",
+				},
+				cli.StringFlag{
+					Name: "shuffle, s",
+					Usage: "Set playback option shuffle [on, off]",
+				},
+			},
+			Usage: "Display current playback options",
 			Action: func(c *cli.Context) error {
-				optionsAction(c)
+				optAction(c)
 				return nil
 			},
 		},
