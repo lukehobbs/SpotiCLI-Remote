@@ -41,25 +41,22 @@ GLOBAL OPTIONS:
 
 ## Todo
 
+- Move repeat and shuffle commands to be flags of options command
+- Search should be prioritized to search user's saved library first
+- Seek options (fast forward, rewind)
+- ~~Add an option to clear the console~~
+- ~~Allow selection of devices using a search~~
+- ~~Change options (shuffle/repeat)~~
+- ~~Control device selection~~
 - ~~Control media playback (pause/play, next/previous song)~~
-- ~~Login to Spotify through WebAPI~~
-- ~~Store OAuth 2 Token in user's home directory to avoid having to login every run~~
 - ~~Control volume of media playback~~
 - ~~Get information about currently playing song~~
-- ~~Control device selection~~
-- ~~Skip track (next/previous song)~~
-- ~~Add an option to clear the console~~
-- ~~Change options (shuffle/repeat)~~
-- Seek options (fast forward, rewind)
-- ~~Allow selection of devices using a search~~
+- ~~Login to Spotify through WebAPI~~
 - ~~Search for a playlist to listen to~~
-  - ~~Display username of playlist creator next to playlist name~~
-- ~~Search for an album to listen to~~
-  - ~~Display album artist(s) next to album name~~
 - ~~Search for a song to listen to~~
-  - ~~Play track/album/artist/playlist from most recent search~~
-- Search should be prioritized to search user's saved library first
-- Move repeat and shuffle commands to be flags of options command
+- ~~Search for an album to listen to~~
+- ~~Skip track (next/previous song)~~
+- ~~Store OAuth 2 Token in user's home directory to avoid having to login every run~~
 
 ## Stretch Goals
 
