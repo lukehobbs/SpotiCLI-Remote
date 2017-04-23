@@ -106,6 +106,24 @@ OPTIONS:
 
 	app.Commands = []cli.Command{
 		{
+			Name:    "clear",
+			Aliases: []string{"clc"},
+			Usage:   "Clear the command window",
+			Action: func(c *cli.Context) error {
+				clearAction(c)
+				return nil
+			},
+		},
+		{
+			Name:    "current",
+			Aliases: []string{"c"},
+			Usage:   "Display information about the current playback",
+			Action: func(c *cli.Context) error {
+				currentAction(c)
+				return nil
+			},
+		},
+		{
 			Name:      "devices",
 			Aliases:   []string{"d"},
 			Usage:     "List available devices",
@@ -116,29 +134,44 @@ OPTIONS:
 			},
 		},
 		{
-			Name:    "search",
-			Aliases: []string{"s"},
+			Name:    "next",
+			Aliases: []string{"n"},
+			Usage:   "Skip to the next track in queue",
+			Action: func(c *cli.Context) error {
+				skipAction(c, true)
+				return nil
+			},
+		},
+		{
+			Name:    "opt",
+			Aliases: []string{"o"},
 			Flags: []cli.Flag{
-				cli.BoolFlag{
-					Name:  "artist, ar",
-					Usage: "Search for artist, `NAME`, on Spotify",
+				cli.StringFlag{
+					Name:  "repeat, r",
+					Usage: "Set playback option repeat [on, off]",
 				},
-				cli.BoolFlag{
-					Name:  "album, al",
-					Usage: "Search albums, `NAME`, on Spotify",
-				},
-				cli.BoolFlag{
-					Name:  "track, tr",
-					Usage: "Search tracks, `NAME`, on Spotify",
-				},
-				cli.BoolFlag{
-					Name:  "playlist, pl",
-					Usage: "Search playlists, `NAME`, on Spotify",
+				cli.StringFlag{
+					Name:  "shuffle, s",
+					Usage: "Set playback option shuffle [on, off]",
 				},
 			},
-			Usage: "Search Spotify for artists, albums, tracks, or playlists",
+			Usage: "Options for changing current playback parameters",
+			After: func(c *cli.Context) error {
+				time.Sleep(200 * time.Millisecond)
+				displayOpts()
+				return nil
+			},
 			Action: func(c *cli.Context) error {
-				searchAction(c)
+				optAction(c)
+				return nil
+			},
+		},
+		{
+			Name:    "pause",
+			Aliases: []string{"pp"},
+			Usage:   "Pause playback",
+			Action: func(c *cli.Context) error {
+				pauseAction(c)
 				return nil
 			},
 		},
@@ -174,11 +207,47 @@ OPTIONS:
 			},
 		},
 		{
-			Name:    "pause",
-			Aliases: []string{"pp"},
-			Usage:   "Pause playback",
+			Name:    "prev",
+			Aliases: []string{"pr"},
+			Usage:   "Skip to the previous track in queue",
 			Action: func(c *cli.Context) error {
-				pauseAction(c)
+				skipAction(c, false)
+				return nil
+			},
+		},
+		{
+			Name:    "quit",
+			Aliases: []string{"q"},
+			Usage:   "Quit application",
+			Action: func(c *cli.Context) error {
+				quitAction(c)
+				return nil
+			},
+		},
+		{
+			Name:    "search",
+			Aliases: []string{"s"},
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "artist, ar",
+					Usage: "Search for artist, `NAME`, on Spotify",
+				},
+				cli.BoolFlag{
+					Name:  "album, al",
+					Usage: "Search albums, `NAME`, on Spotify",
+				},
+				cli.BoolFlag{
+					Name:  "track, tr",
+					Usage: "Search tracks, `NAME`, on Spotify",
+				},
+				cli.BoolFlag{
+					Name:  "playlist, pl",
+					Usage: "Search playlists, `NAME`, on Spotify",
+				},
+			},
+			Usage: "Search Spotify for artists, albums, tracks, or playlists",
+			Action: func(c *cli.Context) error {
+				searchAction(c)
 				return nil
 			},
 		},
@@ -217,75 +286,6 @@ OPTIONS:
 						return nil
 					},
 				},
-			},
-		},
-		{
-			Name:    "current",
-			Aliases: []string{"c"},
-			Usage:   "Display information about the current playback",
-			Action: func(c *cli.Context) error {
-				currentAction(c)
-				return nil
-			},
-		},
-		{
-			Name:    "next",
-			Aliases: []string{"n"},
-			Usage:   "Skip to the next track in queue",
-			Action: func(c *cli.Context) error {
-				skipAction(c, true)
-				return nil
-			},
-		},
-		{
-			Name:    "prev",
-			Aliases: []string{"pr"},
-			Usage:   "Skip to the previous track in queue",
-			Action: func(c *cli.Context) error {
-				skipAction(c, false)
-				return nil
-			},
-		},
-		{
-			Name:    "clear",
-			Aliases: []string{"clc"},
-			Usage:   "Clear the command window",
-			Action: func(c *cli.Context) error {
-				clearAction(c)
-				return nil
-			},
-		},
-		{
-			Name:    "opt",
-			Aliases: []string{"o"},
-			Flags: []cli.Flag{
-				cli.StringFlag{
-					Name:  "repeat, r",
-					Usage: "Set playback option repeat [on, off]",
-				},
-				cli.StringFlag{
-					Name:  "shuffle, s",
-					Usage: "Set playback option shuffle [on, off]",
-				},
-			},
-			Usage: "Options for changing current playback parameters",
-			After: func(c *cli.Context) error {
-				time.Sleep(200 * time.Millisecond)
-				displayOpts()
-				return nil
-			},
-			Action: func(c *cli.Context) error {
-				optAction(c)
-				return nil
-			},
-		},
-		{
-			Name:    "quit",
-			Aliases: []string{"q"},
-			Usage:   "Quit application",
-			Action: func(c *cli.Context) error {
-				quitAction(c)
-				return nil
 			},
 		},
 	}
