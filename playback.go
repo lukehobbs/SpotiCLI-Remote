@@ -303,7 +303,7 @@ func getVolume() int {
 		}
 	}
 	if a == -1 {
-		panic("Error: no devices are active, please begin playback on a Spotify Conneceted device first")
+		panic("Error: no devices are active, please begin playback.")
 	}
 	return a
 }
@@ -322,7 +322,6 @@ func playAction(c *cli.Context) {
 		return
 	}
 	if c.IsSet("device") {
-		fmt.Println("Settings device... ", c.String("device"))
 		e := setDevice(c.String("device"))
 		if !e {
 			err := cli.ShowCommandHelp(c, c.Command.Name)
@@ -383,32 +382,28 @@ func setDevice(s string) bool {
 	return false
 }
 
-func playTrackNum(i int) {
-	client := auth.NewClient(tok)
-	r := LastSearch.Tracks.Tracks
-	if len(r) == 0 {
-		fmt.Println("No search results found.")
-		return
-	}
-	if i > 0 && i < len(r) {
-		t := r[i-1]
-		o := spotify.PlayOptions{URIs: []spotify.URI{t.URI}}
-		err := client.PlayOpt(&o)
-		checkErr(err)
-		return
-	}
-	return
-}
-
 func play(s []string, t string) {
 	client := auth.NewClient(tok)
 	a := strings.Join(s, " ")
 	if i, err := strconv.Atoi(a); err == nil {
-		playID(i, t)
+		switch t {
+		case track:
+			t := getInterfaceSlice(LastSearch.Tracks.Tracks)
+			playNum(i, t)
+		case artist:
+			t := getInterfaceSlice(LastSearch.Artists.Artists)
+			playNum(i, t)
+		case album:
+			t := getInterfaceSlice(LastSearch.Albums.Albums)
+			playNum(i, t)
+		case plist:
+			t := getInterfaceSlice(LastSearch.Playlists.Playlists)
+			playNum(i, t)
+		}
 		return
 	}
 	u := luckySearch(a, t)
-	if t == "track" && u != "" {
+	if t == track && u != "" {
 		o := spotify.PlayOptions{URIs: []spotify.URI{u}}
 		err := client.PlayOpt(&o)
 		checkErr(err)
@@ -422,68 +417,69 @@ func play(s []string, t string) {
 	}
 }
 
-func playID(i int, t string) {
-	switch t {
-	case track:
-		playTrackNum(i)
-	case artist:
-		playArtistNum(i)
-	case album:
-		playAlbumNum(i)
-	case plist:
-		playPlaylistNum(i)
-	}
-}
-
-func playArtistNum(i int) {
+func playNum(i int, t []interface{}) {
 	client := auth.NewClient(tok)
-	r := LastSearch.Artists.Artists
-	if len(r) == 0 {
+	if len(t) == 0 {
 		fmt.Println("No search results found.")
 		return
 	}
-	if i > 0 && i < len(r) {
-		t := r[i-1]
-		o := spotify.PlayOptions{PlaybackContext: &t.URI}
+	if i > 0 && i < len(t) {
+		u := getURI(t[i-1])
+		if _, ok := t[0].(spotify.FullTrack); ok {
+			o := spotify.PlayOptions{URIs: []spotify.URI{u}}
+			err := client.PlayOpt(&o)
+			checkErr(err)
+			return
+		}
+		o := spotify.PlayOptions{PlaybackContext: &u}
 		err := client.PlayOpt(&o)
 		checkErr(err)
 		return
 	}
-	return
 }
 
-func playAlbumNum(i int) {
-	client := auth.NewClient(tok)
-	r := LastSearch.Albums.Albums
-	if len(r) == 0 {
-		fmt.Println("No search results found.")
-		return
+func getURI(r interface{}) spotify.URI {
+	switch r := r.(type) {
+	case spotify.FullTrack:
+		return r.URI
+	case spotify.SimplePlaylist:
+		return r.URI
+	case spotify.SimpleAlbum:
+		return r.URI
+	case spotify.FullArtist:
+		return r.URI
 	}
-	if i > 0 && i < len(r) {
-		t := r[i-1]
-		o := spotify.PlayOptions{PlaybackContext: &t.URI}
-		err := client.PlayOpt(&o)
-		checkErr(err)
-		return
-	}
-	return
+	return ""
 }
 
-func playPlaylistNum(i int) {
-	client := auth.NewClient(tok)
-	r := LastSearch.Playlists.Playlists
-	if len(r) == 0 {
-		fmt.Println("No search results found.")
-		return
+func getInterfaceSlice(r interface{}) []interface{} {
+	switch r := r.(type) {
+	case []spotify.FullTrack:
+		var interfaceSlice = make([]interface{}, len(r))
+		for i, d := range r {
+			interfaceSlice[i] = d
+		}
+		return interfaceSlice
+	case []spotify.FullArtist:
+		var interfaceSlice = make([]interface{}, len(r))
+		for i, d := range r {
+			interfaceSlice[i] = d
+		}
+		return interfaceSlice
+	case []spotify.SimpleAlbum:
+		var interfaceSlice = make([]interface{}, len(r))
+		for i, d := range r {
+			interfaceSlice[i] = d
+		}
+		return interfaceSlice
+	case []spotify.SimplePlaylist:
+		var interfaceSlice = make([]interface{}, len(r))
+		for i, d := range r {
+			interfaceSlice[i] = d
+		}
+		return interfaceSlice
 	}
-	if i > 0 && i < len(r) {
-		t := r[i-1]
-		o := spotify.PlayOptions{PlaybackContext: &t.URI}
-		err := client.PlayOpt(&o)
-		checkErr(err)
-		return
-	}
-	return
+	return nil
 }
 
 func luckySearch(s string, t string) spotify.URI {
