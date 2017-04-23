@@ -62,6 +62,7 @@ func init() {
 func main() {
 	app := cli.NewApp()
 	app.Name = "Spotcon"
+	app.HelpName = "spotcon"
 	app.Version = "0.0.1"
 	app.Compiled = time.Now()
 	app.Authors = []cli.Author{
@@ -73,11 +74,42 @@ func main() {
 	app.Usage = "Control Spotify Connect enabled devices via terminal."
 	app.UsageText = "spotify> command [subcommand] [--flags] [arguments...]"
 
+	cli.AppHelpTemplate = `NAME:
+   {{.Name}}{{if .Usage}} - {{.Usage}}{{end}}
+USAGE:
+   {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}} {{if .VisibleFlags}}[global options]{{end}}{{if .Commands}} command [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{end}}
+DESCRIPTION:
+   {{.Description}}{{end}}{{if len .Authors}}
+AUTHOR{{with $length := len .Authors}}{{if ne 1 $length}}S{{end}}{{end}}:
+   {{range $index, $author := .Authors}}{{if $index}}
+   {{end}}{{$author}}{{end}}{{end}}{{if .VisibleCommands}}
+COMMANDS:{{range .VisibleCategories}}{{if .Name}}
+   {{.Name}}:{{end}}{{range .VisibleCommands}}
+     {{join .Names ", "}}{{"\t"}}{{.Usage}}{{end}}{{end}}{{end}}{{if .VisibleFlags}}
+GLOBAL OPTIONS:
+   {{range $index, $option := .VisibleFlags}}{{if $index}}
+   {{end}}{{$option}}{{end}}{{end}}
+`
+
+	cli.CommandHelpTemplate = `NAME:
+   {{.HelpName}} - {{.Usage}}
+USAGE:
+   {{.HelpName}}{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}{{end}}{{if .Category}}
+CATEGORY:
+   {{.Category}}{{end}}{{if .Description}}
+DESCRIPTION:
+   {{.Description}}{{end}}{{if .VisibleFlags}}
+OPTIONS:
+   {{range .VisibleFlags}}{{.}}
+   {{end}}{{end}}
+`
+
 	app.Commands = []cli.Command{
 		{
-			Name:    "devices",
-			Aliases: []string{"d"},
-			Usage:   "List available devices and their numbers",
+			Name:      "devices",
+			Aliases:   []string{"d"},
+			Usage:     "List available devices",
+			ArgsUsage: "",
 			Action: func(c *cli.Context) error {
 				devicesAction(c)
 				return nil
@@ -135,7 +167,7 @@ func main() {
 					Usage: "Play playlist with specified `NAME` or number from search results",
 				},
 			},
-			Usage: "Start/Resume playback on device, or currently playing device if none specified",
+			Usage: "Start/Resume playback",
 			Action: func(c *cli.Context) error {
 				playAction(c)
 				return nil
@@ -144,7 +176,7 @@ func main() {
 		{
 			Name:    "pause",
 			Aliases: []string{"pp"},
-			Usage:   "Pause playback on currently playing device",
+			Usage:   "Pause playback",
 			Action: func(c *cli.Context) error {
 				pauseAction(c)
 				return nil
@@ -153,23 +185,38 @@ func main() {
 		{
 			Name:      "vol",
 			Aliases:   []string{"v"},
-			Usage:     "Options for changing volume on currently playing device",
-			//ArgsUsage: "[up, down, PERCENT]",
-			Action: func(c *cli.Context) error {
-				if c.Args().First() == "up" {
-					volAction(c, true)
-					return nil
-				}
-				if c.Args().First() == "down" {
-					volAction(c, false)
-					return nil
-				}
-				if c.NArg() > 0 {
-					volSetAction(c)
-					return nil
-				}
-				fmt.Printf("Volume: %v%%\n", getVolume())
+			Usage:     "Options for changing volume of playback",
+			ArgsUsage: "[arguments...]",
+			After: func(c *cli.Context) error {
+				time.Sleep(150 * time.Millisecond)
+				displayVolume()
 				return nil
+			},
+			Subcommands: []cli.Command{
+				{
+					Name:  "up",
+					Usage: "Increase volume by PERCENT or 10% if not specified",
+					Action: func(c *cli.Context) error {
+						volAdjustAction(c, true)
+						return nil
+					},
+				},
+				{
+					Name:  "down",
+					Usage: "Decrease volume by PERCENT or 10% if not specified",
+					Action: func(c *cli.Context) error {
+						volAdjustAction(c, false)
+						return nil
+					},
+				},
+				{
+					Name:  "set",
+					Usage: "Set volume to PERCENT",
+					Action: func(c *cli.Context) error {
+						volSetAction(c)
+						return nil
+					},
+				},
 			},
 		},
 		{
@@ -217,11 +264,16 @@ func main() {
 					Usage: "Set playback option repeat [on, off]",
 				},
 				cli.StringFlag{
-					Name: "shuffle, s",
+					Name:  "shuffle, s",
 					Usage: "Set playback option shuffle [on, off]",
 				},
 			},
-			Usage: "Display current playback options",
+			Usage: "Options for changing current playback parameters",
+			After: func(c *cli.Context) error {
+				time.Sleep(200 * time.Millisecond)
+				displayOpts()
+				return nil
+			},
 			Action: func(c *cli.Context) error {
 				optAction(c)
 				return nil

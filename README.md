@@ -7,36 +7,34 @@ Spotcon is a WIP command line interface, written in Go, that controls media play
 Syntax: spotcon> command [subcommand] [--flags] [arguments...]
 
 ```
+NAME:
+   Spotcon - Control Spotify Connect enabled devices via terminal.
+USAGE:
+   spotify> command [subcommand] [--flags] [arguments...]
+AUTHOR:
+   Luke Hobbs <lukeehobbs@gmail.com>
 COMMANDS:
-     clear,   clc  Clear the command window
-     current, c    Display information about the current playback
-     devices, d    List available devices and their numbers
-     next,    n    Skip to the next track in queue
-     options, o    Display current playback options
-     pause,   pp   Pause playback on currently playing device
-     play,    p    Start/Resume playback on device, or currently playing device if none specified
-        --device DEVICE, -d  DEVICE  Start/resume playback on specified  DEVICE or number from device list
-        --track  NAME,  --tr NAME    Play track with specified NAME or number from search results
-        --album  NAME,  --al NAME    Play album with specified NAME or number from search results
-        --artist NAME,  --ar NAME    Play artist with specified NAME or number from search results
-        --plist  NAME,  --pl NAME    Play playlist with specified NAME or number from search results
-     prev,    pr   Skip to the previous track in queue
-     quit,    q    Quit application
-     repeat,  r    turn on playlist option repeat
-        [off, track, playlist] 
-     search,  s    Search Spotify for artists, albums, tracks, or playlists
-        --artist NAME,  --ar NAME    Search for artist, NAME, on Spotify
-        --album  NAME,  --al NAME    Search albums, NAME, on Spotify
-        --track  NAME,  --tr NAME    Search tracks, NAME, on Spotify
-        --plist  NAME,  --pl NAME    Search playlists, NAME, on Spotify
-     shuffle, sh   Toggle playback option shuffle
-     vol,     v    Options for changing volume on currently playing device
-        [up, down, PERCENT]        
-     help,    h    Shows a list of commands or help for one command
-
+     clear, clc  Clear the command window
+     current, c  Display information about the current playback
+     devices, d  List available devices
+     next, n     Skip to the next track in queue
+     opt, o      Options for changing current playback parameters
+     pause, pp   Pause playback
+     play, p     Start/Resume playback
+     prev, pr    Skip to the previous track in queue
+     quit, q     Quit application
+     search, s   Search Spotify for artists, albums, tracks, or playlists
+     vol, v      Options for changing volume of playback
+     help, h     Shows a list of commands or help for one command
 GLOBAL OPTIONS:
    --help, -h     show help
    --version, -v  print the version
+```
+
+## Commands
+
+```
+
 ```
 
 ## Todo

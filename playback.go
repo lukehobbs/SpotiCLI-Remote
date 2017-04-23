@@ -147,12 +147,12 @@ func playAction(c *cli.Context) {
 		checkErr(err)
 		return
 	}
-	client := auth.NewClient(tok)
-	if c.NumFlags() == 0 {
-		err := client.Play()
+	if c.NArg() > 0 {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
 	}
+	client := auth.NewClient(tok)
 	if c.IsSet("device") {
 		e := setDevice(c.String("device"))
 		if !e {
@@ -160,8 +160,7 @@ func playAction(c *cli.Context) {
 			checkErr(err)
 			return
 		}
-		if c.NumFlags() == 1 { // Device is the only flag set.
-			fmt.Println("Device is only flag. Playing...")
+		if c.NumFlags() == 2 { // Device is the only flag set.
 			err := client.Play()
 			checkErr(err)
 			return
@@ -173,13 +172,17 @@ func playAction(c *cli.Context) {
 	}
 	if c.IsSet(album) {
 		play(c.Args(), album)
+		return
 	}
 	if c.IsSet(artist) {
 		play(c.Args(), artist)
+		return
 	}
 	if c.IsSet(plist) {
 		play(c.Args(), plist)
 	}
+	err := client.Play()
+	checkErr(err)
 }
 
 func playNum(i int, t []interface{}) {
@@ -229,8 +232,6 @@ func optAction(c *cli.Context) {
 			setShuffle(false)
 		}
 	}
-	time.Sleep(250 * time.Millisecond)
-	displayOpts()
 }
 
 func searchAction(c *cli.Context) {
@@ -269,13 +270,13 @@ func currentAction(c *cli.Context) {
 		checkErr(err)
 		return
 	}
-	trk := getCurrentTrack()
+	tr := getCurrentTrack()
 	t := template.New("longTrackTemplate")
 	t, err := t.Parse(longTrackTemplate)
 	checkErr(err)
 
 	fmt.Println("Device:", getActiveDeviceName())
-	err = t.Execute(os.Stdout, trk)
+	err = t.Execute(os.Stdout, tr)
 	checkErr(err)
 	fmt.Printf("Volume: %v%%\n", getVolume())
 }
@@ -290,42 +291,37 @@ func skipAction(c *cli.Context, b bool) {
 	if b {
 		err := client.Next()
 		checkErr(err)
-		return
+	} else {
+		err := client.Previous()
+		checkErr(err)
 	}
-	err := client.Previous()
-	checkErr(err)
+	time.Sleep(200 * time.Millisecond)
+	currentAction(c)
 	return
 }
 
-func volAdjust(b bool) {
+func volAdjustAction(c *cli.Context, b bool) {
+	p := 10
+	if c.Args().First() != "" {
+		var err error
+		p, err = strconv.Atoi(c.Args().First())
+		checkErr(err)
+	}
 	v := getVolume()
 	switch b {
 	case true:
-		if v >= 90 {
+		if v+p >= 100 {
 			setVolume(100)
-			return
+			break
 		}
-		setVolume(v + 10)
-		return
+		setVolume(v + p)
 	case false:
-		if v <= 10 {
+		if v-p <= 0 {
 			setVolume(0)
-			return
+			break
 		}
-		setVolume(v - 10)
-		return
+		setVolume(v - p)
 	}
-}
-
-func volAction(c *cli.Context, b bool) {
-	if c.NArg() > 1 {
-		err := cli.ShowCommandHelp(c, c.Command.Name)
-		checkErr(err)
-		return
-	}
-	volAdjust(b)
-	time.Sleep(250 * time.Millisecond)
-	displayVolume()
 }
 
 func volSetAction(c *cli.Context) {
@@ -336,13 +332,10 @@ func volSetAction(c *cli.Context) {
 	}
 	i, err := strconv.Atoi(c.Args().First())
 	checkErr(err)
-	if i > 100 || i < 0 {
-		fmt.Println("ERROR: Invalid argument, ", i)
-		return
+	if i > 100 {
+		i = 100
 	}
 	setVolume(i)
-	time.Sleep(250 * time.Millisecond)
-	displayVolume()
 }
 
 func displaySearchResults(r *spotify.SearchResult) {
@@ -528,7 +521,6 @@ func setDevice(s string) bool {
 	}
 
 	fmt.Println("ERROR: Could not connect to device, ", s)
-	checkErr(err)
 	return false
 }
 
