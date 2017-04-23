@@ -15,6 +15,13 @@ import (
 // LastSearch is the results of the last search query
 var LastSearch *spotify.SearchResult
 
+const (
+	track  = "track"
+	album  = "album"
+	artist = "artist"
+	plist  = "playlist"
+)
+
 func searchAction(c *cli.Context) {
 	var t int
 	client := auth.NewClient(tok)
@@ -23,16 +30,16 @@ func searchAction(c *cli.Context) {
 		displayLastSearch()
 		return
 	}
-	if c.Bool("album") {
+	if c.Bool(album) {
 		t++
 	}
-	if c.Bool("artist") {
+	if c.Bool(artist) {
 		t += 2
 	}
-	if c.Bool("playlist") {
+	if c.Bool(plist) {
 		t += 4
 	}
-	if c.Bool("track") {
+	if c.Bool(track) {
 		t += 8
 	}
 	if t == 0 {
@@ -54,48 +61,63 @@ func displayLastSearch() {
 }
 
 func displaySearchResults(r *spotify.SearchResult) {
-	if r.Tracks != nil {
-		fmt.Println("Tracks: ")
-		t := template.New("shortTrackTemplate")
-		t, err := t.Parse(shortTrackTemplate)
-		checkErr(err)
-		for i := 0; i < 5; i++ {
-			v := r.Tracks.Tracks[i]
-			fmt.Printf("  [%d]:\t", i+1)
-			err = t.Execute(os.Stdout, v)
-			checkErr(err)
-		}
+	if len(r.Tracks.Tracks) > 0 {
+		displayTracks(r.Tracks.Tracks)
 	}
-	if r.Artists != nil {
-		fmt.Println("Artists: ")
-		for i := 0; i < 5; i++ {
-			v := r.Artists.Artists[i]
-			fmt.Printf("  [%d]:\t%v\n", i+1, v.Name)
-		}
+	if len(r.Artists.Artists) > 0 {
+		displayArtists(r.Artists.Artists)
 	}
-	if r.Albums != nil {
-		client := auth.NewClient(tok)
-		fmt.Println("Albums: ")
-		t := template.New("shortAlbumTemplate")
-		t, err := t.Parse(shortAlbumTemplate)
-		checkErr(err)
-		for i := 0; i < 5; i++ {
-			v := r.Albums.Albums[i]
-			a, err := client.GetAlbum(v.ID)
-			checkErr(err)
-			fmt.Printf("  [%d]:\t", i+1)
-			err = t.Execute(os.Stdout, a)
-			checkErr(err)
-		}
+	if len(r.Albums.Albums) > 0 {
+		displayAlbums(r.Albums.Albums)
 	}
-	if r.Playlists != nil {
-		fmt.Println("Playlists: ")
-		for i := 0; i < 5; i++ {
-			v := r.Playlists.Playlists[i]
-			fmt.Printf("  [%d]:\t\"%v\" - %s\n", i+1, v.Name, v.Owner.ID)
-		}
+	if len(r.Playlists.Playlists) > 0 {
+		displayPlaylists(r.Playlists.Playlists)
 	}
+}
 
+func displayTracks(r []spotify.FullTrack) {
+	fmt.Println("Tracks: ")
+	t := template.New("shortTrackTemplate")
+	t, err := t.Parse(shortTrackTemplate)
+	checkErr(err)
+	for i := 0; i < 5 && i < len(r); i++ {
+		v := r[i]
+		fmt.Printf("  [%d]:\t", i+1)
+		err = t.Execute(os.Stdout, v)
+		checkErr(err)
+	}
+}
+
+func displayArtists(r []spotify.FullArtist) {
+	fmt.Println("Artists: ")
+	for i := 0; i < 5 && i < len(r); i++ {
+		v := r[i]
+		fmt.Printf("  [%d]:\t%v\n", i+1, v.Name)
+	}
+}
+
+func displayAlbums(r []spotify.SimpleAlbum) {
+	client := auth.NewClient(tok)
+	fmt.Println("Albums: ")
+	t := template.New("shortAlbumTemplate")
+	t, err := t.Parse(shortAlbumTemplate)
+	checkErr(err)
+	for i := 0; i < 5 && i < len(r); i++ {
+		v := r[i]
+		al, err := client.GetAlbum(v.ID)
+		checkErr(err)
+		fmt.Printf("  [%d]:\t", i+1)
+		err = t.Execute(os.Stdout, al)
+		checkErr(err)
+	}
+}
+
+func displayPlaylists(r []spotify.SimplePlaylist) {
+	fmt.Println("Playlists: ")
+	for i := 0; i < 5 && i < len(r); i++ {
+		v := r[i]
+		fmt.Printf("  [%d]:\t\"%v\" - %s\n", i+1, v.Name, v.Owner.ID)
+	}
 }
 
 func repeatAction(c *cli.Context) {
@@ -105,9 +127,9 @@ func repeatAction(c *cli.Context) {
 		return
 	}
 	switch c.Args().First() {
-	case "track":
+	case track:
 		setRepeat("track")
-	case "playlist":
+	case plist:
 		setRepeat("context")
 	case "off":
 		setRepeat("off")
@@ -199,56 +221,50 @@ func getCurrentTrack() *spotify.FullTrack {
 	return current.Item
 }
 
-func nextAction(c *cli.Context) {
+func skipAction(c *cli.Context, b bool) {
 	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
 	}
 	client := auth.NewClient(tok)
-	err := client.Next()
-	checkErr(err)
-}
-
-func prevAction(c *cli.Context) {
-	if c.NArg() > 0 {
-		err := cli.ShowCommandHelp(c, c.Command.Name)
+	if b {
+		err := client.Next()
 		checkErr(err)
 		return
 	}
-	client := auth.NewClient(tok)
 	err := client.Previous()
 	checkErr(err)
+	return
 }
 
-func volUpAction(c *cli.Context) {
+func volAdjust(b bool) {
+	v := getVolume()
+	switch b {
+	case true:
+		if v >= 90 {
+			setVolume(100)
+			return
+		}
+		setVolume(v + 10)
+		return
+	case false:
+		if v <= 10 {
+			setVolume(0)
+			return
+		}
+		setVolume(v - 10)
+		return
+	}
+}
+
+func volAction(c *cli.Context, b bool) {
 	if c.NArg() > 1 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
 	}
-	v := getVolume()
-	i := v + 10
-	if i > 100 {
-		i = 100
-	}
-	setVolume(i)
-	time.Sleep(250 * time.Millisecond)
-	fmt.Printf("Volume: %v%%\n", getVolume())
-}
-
-func volDownAction(c *cli.Context) {
-	if c.NArg() > 1 {
-		err := cli.ShowCommandHelp(c, c.Command.Name)
-		checkErr(err)
-		return
-	}
-	v := getVolume()
-	i := v - 10
-	if i < 0 {
-		i = 0
-	}
-	setVolume(i)
+	volAdjust(b)
 	time.Sleep(250 * time.Millisecond)
 	fmt.Printf("Volume: %v%%\n", getVolume())
 }
@@ -320,18 +336,18 @@ func playAction(c *cli.Context) {
 			return
 		}
 	}
-	if c.IsSet("track") {
-		playTrack(c.Args())
+	if c.IsSet(track) {
+		play(c.Args(), track)
 		return
 	}
-	if c.IsSet("album") {
-		playAlbum(c.Args())
+	if c.IsSet(album) {
+		play(c.Args(), album)
 	}
-	if c.IsSet("artist") {
-		playArtist(c.Args())
+	if c.IsSet(artist) {
+		play(c.Args(), artist)
 	}
-	if c.IsSet("plist") {
-		playPlaylist(c.Args())
+	if c.IsSet(plist) {
+		play(c.Args(), plist)
 	}
 }
 
@@ -367,19 +383,6 @@ func setDevice(s string) bool {
 	return false
 }
 
-func playTrack(s []string) {
-	client := auth.NewClient(tok)
-	t := strings.Join(s, " ")
-	if i, err := strconv.Atoi(t); err == nil {
-		playTrackNum(i)
-		return
-	}
-	u := luckySearchTrack(t)
-	o := spotify.PlayOptions{URIs: u}
-	err := client.PlayOpt(&o)
-	checkErr(err)
-}
-
 func playTrackNum(i int) {
 	client := auth.NewClient(tok)
 	r := LastSearch.Tracks.Tracks
@@ -397,19 +400,38 @@ func playTrackNum(i int) {
 	return
 }
 
-func playArtist(s []string) {
+func play(s []string, t string) {
 	client := auth.NewClient(tok)
-	t := strings.Join(s, " ")
-	if i, err := strconv.Atoi(t); err == nil {
-		playArtistNum(i)
+	a := strings.Join(s, " ")
+	if i, err := strconv.Atoi(a); err == nil {
+		playID(i, t)
 		return
 	}
-	u := luckySearchArtist(t)
+	u := luckySearch(a, t)
+	if t == "track" && u != "" {
+		o := spotify.PlayOptions{URIs: []spotify.URI{u}}
+		err := client.PlayOpt(&o)
+		checkErr(err)
+		return
+	}
 	if u != "" {
 		o := spotify.PlayOptions{PlaybackContext: &u}
 		err := client.PlayOpt(&o)
 		checkErr(err)
 		return
+	}
+}
+
+func playID(i int, t string) {
+	switch t {
+	case track:
+		playTrackNum(i)
+	case artist:
+		playArtistNum(i)
+	case album:
+		playAlbumNum(i)
+	case plist:
+		playPlaylistNum(i)
 	}
 }
 
@@ -430,22 +452,6 @@ func playArtistNum(i int) {
 	return
 }
 
-func playAlbum(s []string) {
-	client := auth.NewClient(tok)
-	t := strings.Join(s, " ")
-	if i, err := strconv.Atoi(t); err == nil {
-		playAlbumNum(i)
-		return
-	}
-	u := luckySearchAlbum(t)
-	if u != "" {
-		o := spotify.PlayOptions{PlaybackContext: &u}
-		err := client.PlayOpt(&o)
-		checkErr(err)
-		return
-	}
-}
-
 func playAlbumNum(i int) {
 	client := auth.NewClient(tok)
 	r := LastSearch.Albums.Albums
@@ -461,22 +467,6 @@ func playAlbumNum(i int) {
 		return
 	}
 	return
-}
-
-func playPlaylist(s []string) {
-	client := auth.NewClient(tok)
-	t := strings.Join(s, " ")
-	if i, err := strconv.Atoi(t); err == nil {
-		playPlaylistNum(i)
-		return
-	}
-	u := luckySearchPlaylist(t)
-	if u != "" {
-		o := spotify.PlayOptions{PlaybackContext: &u}
-		err := client.PlayOpt(&o)
-		checkErr(err)
-		return
-	}
 }
 
 func playPlaylistNum(i int) {
@@ -496,60 +486,48 @@ func playPlaylistNum(i int) {
 	return
 }
 
-func luckySearchTrack(s string) []spotify.URI {
-	if s == "" {
-		return nil
-	}
+func luckySearch(s string, t string) spotify.URI {
 	client := auth.NewClient(tok)
-	r, err := client.Search(s, spotify.SearchType(8))
-	checkErr(err)
-	if len(r.Tracks.Tracks) == 0 {
-		fmt.Println("No tracks found matching: ", s)
-		return nil
-	}
-	return []spotify.URI{r.Tracks.Tracks[0].URI}
-}
-
-func luckySearchArtist(s string) spotify.URI {
-	if s == "" {
+	switch t {
+	case track:
+		r, err := client.Search(s, spotify.SearchType(8))
+		checkErr(err)
+		tr := r.Tracks.Tracks
+		if len(tr) == 0 {
+			fmt.Printf("No %ss found matching: %s", t, s)
+			return ""
+		}
+		return tr[0].URI
+	case artist:
+		r, err := client.Search(s, spotify.SearchType(2))
+		checkErr(err)
+		ar := r.Artists.Artists
+		if len(ar) == 0 {
+			fmt.Printf("No %ss found matching: %s", t, s)
+			return ""
+		}
+		return ar[0].URI
+	case album:
+		r, err := client.Search(s, spotify.SearchType(1))
+		checkErr(err)
+		al := r.Albums.Albums
+		if len(al) == 0 {
+			fmt.Printf("No %ss found matching: %s", t, s)
+			return ""
+		}
+		return al[0].URI
+	case plist:
+		r, err := client.Search(s, spotify.SearchType(4))
+		checkErr(err)
+		pl := r.Playlists.Playlists
+		if len(pl) == 0 {
+			fmt.Printf("No %ss found matching: %s", t, s)
+			return ""
+		}
+		return pl[0].URI
+	default:
 		return ""
 	}
-	client := auth.NewClient(tok)
-	r, err := client.Search(s, spotify.SearchType(2))
-	checkErr(err)
-	if len(r.Artists.Artists) == 0 {
-		fmt.Println("No artists found matching: ", s)
-		return ""
-	}
-	return r.Artists.Artists[0].URI
-}
-
-func luckySearchAlbum(s string) spotify.URI {
-	if s == "" {
-		return ""
-	}
-	client := auth.NewClient(tok)
-	r, err := client.Search(s, spotify.SearchType(1))
-	checkErr(err)
-	if len(r.Albums.Albums) == 0 {
-		fmt.Println("No albums found matching: ", s)
-		return ""
-	}
-	return r.Albums.Albums[0].URI
-}
-
-func luckySearchPlaylist(s string) spotify.URI {
-	if s == "" {
-		return ""
-	}
-	client := auth.NewClient(tok)
-	r, err := client.Search(s, spotify.SearchType(4))
-	checkErr(err)
-	if len(r.Playlists.Playlists) == 0 {
-		fmt.Println("No playlists found matching: ", s)
-		return ""
-	}
-	return r.Playlists.Playlists[0].URI
 }
 
 func pauseAction(c *cli.Context) {

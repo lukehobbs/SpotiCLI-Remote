@@ -157,11 +157,11 @@ func main() {
 			ArgsUsage: "[up, down, PERCENT]",
 			Action: func(c *cli.Context) error {
 				if c.Args().First() == "up" {
-					volUpAction(c)
+					volAction(c, true)
 					return nil
 				}
 				if c.Args().First() == "down" {
-					volDownAction(c)
+					volAction(c, false)
 					return nil
 				}
 				if c.NArg() > 0 {
@@ -186,7 +186,7 @@ func main() {
 			Aliases: []string{"n"},
 			Usage:   "Skip to the next track in queue",
 			Action: func(c *cli.Context) error {
-				nextAction(c)
+				skipAction(c, true)
 				return nil
 			},
 		},
@@ -195,7 +195,7 @@ func main() {
 			Aliases: []string{"pr"},
 			Usage:   "Skip to the previous track in queue",
 			Action: func(c *cli.Context) error {
-				prevAction(c)
+				skipAction(c, false)
 				return nil
 			},
 		},
