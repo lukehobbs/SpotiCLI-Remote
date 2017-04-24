@@ -72,7 +72,7 @@ func main() {
 		},
 	}
 	app.Usage = "Control Spotify Connect enabled devices via terminal."
-	app.UsageText = "spotify> command [subcommand] [--flags] [arguments...]"
+	app.UsageText = "spotcon> command [subcommand] [--flags] [arguments...]"
 
 	cli.AppHelpTemplate = `NAME:
    {{.Name}}{{if .Usage}} - {{.Usage}}{{end}}
@@ -93,12 +93,11 @@ GLOBAL OPTIONS:
 
 	cli.CommandHelpTemplate = `NAME:
    {{.HelpName}} - {{.Usage}}
+
 USAGE:
-   {{.HelpName}}{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}{{end}}{{if .Category}}
-CATEGORY:
-   {{.Category}}{{end}}{{if .Description}}
-DESCRIPTION:
-   {{.Description}}{{end}}{{if .VisibleFlags}}
+   {{.HelpName}}{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}{{end}}
+
+{{if .VisibleFlags}}
 OPTIONS:
    {{range .VisibleFlags}}{{.}}
    {{end}}{{end}}

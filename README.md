@@ -10,7 +10,7 @@ Syntax: spotcon> command [subcommand] [--flags] [arguments...]
 NAME:
    Spotcon - Control Spotify Connect enabled devices via terminal.
 USAGE:
-   spotify> command [subcommand] [--flags] [arguments...]
+   spotcon> command [subcommand] [--flags] [arguments...]
 AUTHOR:
    Luke Hobbs <lukeehobbs@gmail.com>
 COMMANDS:
@@ -31,10 +31,54 @@ GLOBAL OPTIONS:
    --version, -v  print the version
 ```
 
-## Commands
+## Command Options
 
 ```
+NAME:
+   spotcon opt - Options for changing current playback parameters
+   
+USAGE:
+   spotcon opt [command options] 
+   
+OPTIONS:
+   --repeat value, -r value   Set playback option repeat [on, off]
+   --shuffle value, -s value  Set playback option shuffle [on, off]
+   
+NAME:
+   spotcon play - Start/Resume playback
+   
+USAGE:
+   spotcon play [command options]
+    
+OPTIONS:
+   --device NAME, -d NAME    Start/resume playback on specified  NAME or number from device list
+   --track NAME, --tr NAME   Play track with specified NAME or number from search results
+   --album NAME, --al NAME   Play album with specified NAME or number from search results
+   --artist NAME, --ar NAME  Play artist with specified NAME or number from search results
+   --plist NAME, --pl NAME   Play playlist with specified NAME or number from search results
 
+NAME:
+   spotcon search - Search Spotify for artists, albums, tracks, or playlists
+   
+USAGE:
+   spotcon search [command options]
+    
+OPTIONS:
+   --artist NAME, --ar NAME    Search for artist, NAME, on Spotify
+   --album NAME, --al NAME     Search albums, NAME, on Spotify
+   --track NAME, --tr NAME     Search tracks, NAME, on Spotify
+   --playlist NAME, --pl NAME  Search playlists, NAME, on Spotify
+
+NAME:
+   Spotcon vol - Options for changing volume of playback
+
+USAGE:
+   Spotcon vol command [command options] [arguments...]
+
+COMMANDS:
+     up    Increase volume by PERCENT or 10% if not specified
+     down  Decrease volume by PERCENT or 10% if not specified
+     set   Set volume to PERCENT
 ```
 
 ## Todo
@@ -69,38 +113,8 @@ You are logged in as: lukehobbs
 spotcon> devices
 Devices:
   [1]: Samsung (TV)
-  [2]: Desktop (Computer) ACTIVE
-  [3]: Amazon Echo (Speaker)
-
-spotcon> play --device echo --track shut up blink
-
-spotcon> devices
-Devices:
-  [1]: Samsung (TV)
   [2]: Desktop (Computer)
   [3]: Amazon Echo (Speaker) ACTIVE
-
-spotcon> vol 80
-Volume: 80%
-
-spotcon> vol up
-Volume: 90%
-
-spotcon> current
-Track:  Shut Up
-Artist:	blink-182
-Album:	Take Off Your Pants And Jacket
-Volume: 90%
-
-spotcon> options
-Shuffle: On
-Repeat:  Off
-
-spotcon> repeat track
-Repeat:  track
-
-spotcon> shuffle
-Shuffle: Off
 
 spotcon> search bridge
 Tracks: 
@@ -128,13 +142,15 @@ Playlists:
   [4]:	"Alter Bridge" - chemistry11
   [5]:	"Bridge Anytime" - 1259523134
 
-spotcon> play --track 2
-
-spotcon> current
+spotcon> play --device Desktop --track 2
+Device: Desktop
 Track:  Under The Bridge
 Artist:	Red Hot Chili Peppers
 Album:	Blood Sugar Sex Magik (Deluxe Version)
-Volume: 90%
+Volume: 100%
+
+spotcon> vol down 25
+Volume: 75%
 ```
 
 
