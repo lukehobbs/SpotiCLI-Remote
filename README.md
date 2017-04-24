@@ -78,7 +78,7 @@ COMMANDS:
 - ~~Move repeat and shuffle commands to be flags of options command~~
 - Configure command to remove the need for environment variables
 - Search should be prioritized to search user's saved library first
-- Seek options (fast forward, rewind)
+- ~~Seek options (fast forward, rewind)~~
 - ~~Add an option to clear the console~~
 - ~~Allow selection of devices using a search~~
 - ~~Change options (shuffle/repeat)~~
