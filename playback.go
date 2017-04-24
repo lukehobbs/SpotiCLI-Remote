@@ -22,6 +22,24 @@ const (
 	plist  = "playlist"
 )
 
+func currentAction(c *cli.Context) {
+	if c.NArg() > 0 {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
+	tr := getCurrentTrack()
+	t := template.New("longTrackTemplate")
+	t, err := t.Parse(longTrackTemplate)
+	checkErr(err)
+
+	fmt.Println("Device:", getActiveDeviceName())
+	err = t.Execute(os.Stdout, tr)
+	checkErr(err)
+	fmt.Printf("Volume: %v%%\n", getVolume())
+	displayProgress()
+}
+
 func devicesAction(c *cli.Context) {
 	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
@@ -94,6 +112,36 @@ func luckySearch(s string, t string) spotify.URI {
 	}
 }
 
+func optAction(c *cli.Context) {
+	if c.NArg() > 0 {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
+	if c.String("repeat") != "" {
+		switch c.String("repeat") {
+		case "on":
+			setRepeat("context")
+		case "off":
+			setRepeat("off")
+		default:
+			err := cli.ShowCommandHelp(c, c.Command.Name)
+			checkErr(err)
+			return
+		}
+	}
+	if c.String("shuffle") != "" {
+		switch c.String("shuffle") {
+		case "on":
+			setShuffle(true)
+		case "off":
+			setShuffle(false)
+		}
+	}
+	time.Sleep(200 * time.Millisecond)
+	displayOpts()
+}
+
 func pauseAction(c *cli.Context) {
 	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
@@ -143,11 +191,6 @@ func play(s []string, t string) {
 func playAction(c *cli.Context) {
 	if c.NumFlags() > 4 {
 		fmt.Println("ERROR: Too many flags set.")
-		err := cli.ShowCommandHelp(c, c.Command.Name)
-		checkErr(err)
-		return
-	}
-	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
@@ -206,34 +249,6 @@ func playNum(i int, t []interface{}) {
 	}
 }
 
-func optAction(c *cli.Context) {
-	if c.NArg() > 0 {
-		err := cli.ShowCommandHelp(c, c.Command.Name)
-		checkErr(err)
-		return
-	}
-	if c.String("repeat") != "" {
-		switch c.String("repeat") {
-		case "on":
-			setRepeat("context")
-		case "off":
-			setRepeat("off")
-		default:
-			err := cli.ShowCommandHelp(c, c.Command.Name)
-			checkErr(err)
-			return
-		}
-	}
-	if c.String("shuffle") != "" {
-		switch c.String("shuffle") {
-		case "on":
-			setShuffle(true)
-		case "off":
-			setShuffle(false)
-		}
-	}
-}
-
 func searchAction(c *cli.Context) {
 	var t int
 	client := auth.NewClient(tok)
@@ -264,21 +279,41 @@ func searchAction(c *cli.Context) {
 	displaySearchResults(LastSearch)
 }
 
-func currentAction(c *cli.Context) {
-	if c.NArg() > 0 {
-		err := cli.ShowCommandHelp(c, c.Command.Name)
+func seekAction(c *cli.Context, b bool) {
+	var err error
+	t := 15 * 1000
+	_ = t
+	if c.NumFlags() > 2 {
+		fmt.Println("ERROR: Cannot seek forward and backwards")
+		err = cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
 	}
-	tr := getCurrentTrack()
-	t := template.New("longTrackTemplate")
-	t, err := t.Parse(longTrackTemplate)
+	client := auth.NewClient(tok)
+	p, err := client.PlayerCurrentlyPlaying()
 	checkErr(err)
-
-	fmt.Println("Device:", getActiveDeviceName())
-	err = t.Execute(os.Stdout, tr)
-	checkErr(err)
-	fmt.Printf("Volume: %v%%\n", getVolume())
+	pr := p.Progress
+	d := p.Item.Duration
+	if c.Args().First() != "" {
+		t, err = strconv.Atoi(c.Args().First())
+		checkErr(err)
+		t = t * 1000
+	}
+	if b {
+		if pr + t > d {
+			t = d - pr
+		}
+		err = client.Seek(pr + t)
+		checkErr(err)
+	} else {
+		if pr - t < 0 {
+			t = pr
+		}
+		err = client.Seek(pr - t)
+		checkErr(err)
+	}
+	time.Sleep(150 * time.Millisecond)
+	displayProgress()
 }
 
 func skipAction(c *cli.Context, b bool) {
@@ -322,6 +357,8 @@ func volAdjustAction(c *cli.Context, b bool) {
 		}
 		setVolume(v - p)
 	}
+	time.Sleep(150 * time.Millisecond)
+	displayVolume()
 }
 
 func volSetAction(c *cli.Context) {
@@ -336,6 +373,8 @@ func volSetAction(c *cli.Context) {
 		i = 100
 	}
 	setVolume(i)
+	time.Sleep(150 * time.Millisecond)
+	displayVolume()
 }
 
 func displaySearchResults(r *spotify.SearchResult) {
@@ -407,6 +446,15 @@ func displayPlaylists(r []spotify.SimplePlaylist) {
 		v := r[i]
 		fmt.Printf("  [%d]:\t\"%v\" - %s\n", i+1, v.Name, v.Owner.ID)
 	}
+}
+
+func displayProgress() {
+	client := auth.NewClient(tok)
+	p, err := client.PlayerCurrentlyPlaying()
+	checkErr(err)
+	pr := p.Progress / 1000
+	t := p.Item.Duration / 1000
+	fmt.Printf("[%d:%02d/%d:%02d]\n", pr/60, pr%60, t/60, t%60)
 }
 
 func displayVolume() {

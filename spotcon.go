@@ -15,20 +15,22 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const redirectURL = "http://localhost:8080/callback"
-const tokenDir = "/.spoticli"
-const tokenFile = tokenDir + "/token.gob"
-const longTrackTemplate = `Track:  {{.Name}}
+const (
+	redirectURL       = "http://localhost:8080/callback"
+	tokenDir          = "/.spoticli"
+	tokenFile         = tokenDir + "/token.gob"
+	longTrackTemplate = `Track:  {{.Name}}
 Artist:	{{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
 Album:	{{.Album.Name}}
 `
-const shortTrackTemplate = `"{{.Name}}" by {{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
+	shortTrackTemplate = `"{{.Name}}" by {{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
 `
-const shortAlbumTemplate = `"{{.Name}}" by {{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
+	shortAlbumTemplate = `"{{.Name}}" by {{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
 `
-const optionsTemplate = `Shuffle: {{if .ShuffleState}}on{{end}}{{if not .ShuffleState}}off{{end}}
+	optionsTemplate = `Shuffle: {{if .ShuffleState}}on{{end}}{{if not .ShuffleState}}off{{end}}
 Repeat:  {{.RepeatState}}
 `
+)
 
 var (
 	auth = spotify.NewAuthenticator(
@@ -155,11 +157,6 @@ OPTIONS:
 				},
 			},
 			Usage: "Options for changing current playback parameters",
-			After: func(c *cli.Context) error {
-				time.Sleep(200 * time.Millisecond)
-				displayOpts()
-				return nil
-			},
 			Action: func(c *cli.Context) error {
 				optAction(c)
 				return nil
@@ -251,15 +248,33 @@ OPTIONS:
 			},
 		},
 		{
+			Name:      "seek",
+			Usage:     "Options for changing position in playback",
+			ArgsUsage: "[arguments...]",
+			Subcommands: []cli.Command{
+				{
+					Name:  "ff",
+					Usage: "Fast forward playback by SECONDS or 15 seconds if not specified",
+					Action: func(c *cli.Context) error {
+						seekAction(c, true)
+						return nil
+					},
+				},
+				{
+					Name:  "rw",
+					Usage: "Rewind playback by SECONDS or 15 seconds if not specified",
+					Action: func(c *cli.Context) error {
+						seekAction(c, false)
+						return nil
+					},
+				},
+			},
+		},
+		{
 			Name:      "vol",
 			Aliases:   []string{"v"},
 			Usage:     "Options for changing volume of playback",
 			ArgsUsage: "[arguments...]",
-			After: func(c *cli.Context) error {
-				time.Sleep(150 * time.Millisecond)
-				displayVolume()
-				return nil
-			},
 			Subcommands: []cli.Command{
 				{
 					Name:  "up",
