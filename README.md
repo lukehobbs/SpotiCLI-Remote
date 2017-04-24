@@ -24,6 +24,7 @@ COMMANDS:
      prev, pr    Skip to the previous track in queue
      quit, q     Quit application
      search, s   Search Spotify for artists, albums, tracks, or playlists
+     seek        Options for changing position in playback
      vol, v      Options for changing volume of playback
      help, h     Shows a list of commands or help for one command
 GLOBAL OPTIONS:
@@ -62,6 +63,16 @@ OPTIONS:
    --album NAME, --al NAME     Search albums, NAME, on Spotify
    --track NAME, --tr NAME     Search tracks, NAME, on Spotify
    --playlist NAME, --pl NAME  Search playlists, NAME, on Spotify
+
+NAME:
+   Spotcon seek - Options for changing position in playback
+
+USAGE:
+   Spotcon seek command [command options] [arguments...]
+
+COMMANDS:
+     ff  Fast forward playback by SECONDS or 15 seconds if not specified
+     rw  Rewind playback by SECONDS or 15 seconds if not specified
 
 NAME:
    spotcon vol - Options for changing volume of playback
