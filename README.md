@@ -36,20 +36,16 @@ GLOBAL OPTIONS:
 ```
 NAME:
    spotcon opt - Options for changing current playback parameters
-   
 USAGE:
-   spotcon opt [command options] 
-   
+   spotcon opt [command options]  
 OPTIONS:
    --repeat value, -r value   Set playback option repeat [on, off]
    --shuffle value, -s value  Set playback option shuffle [on, off]
    
 NAME:
    spotcon play - Start/Resume playback
-   
 USAGE:
-   spotcon play [command options]
-    
+   spotcon play [command options]   
 OPTIONS:
    --device NAME, -d NAME    Start/resume playback on specified  NAME or number from device list
    --track NAME, --tr NAME   Play track with specified NAME or number from search results
@@ -59,10 +55,8 @@ OPTIONS:
 
 NAME:
    spotcon search - Search Spotify for artists, albums, tracks, or playlists
-   
 USAGE:
    spotcon search [command options]
-    
 OPTIONS:
    --artist NAME, --ar NAME    Search for artist, NAME, on Spotify
    --album NAME, --al NAME     Search albums, NAME, on Spotify
@@ -71,10 +65,8 @@ OPTIONS:
 
 NAME:
    Spotcon vol - Options for changing volume of playback
-
 USAGE:
    Spotcon vol command [command options] [arguments...]
-
 COMMANDS:
      up    Increase volume by PERCENT or 10% if not specified
      down  Decrease volume by PERCENT or 10% if not specified
