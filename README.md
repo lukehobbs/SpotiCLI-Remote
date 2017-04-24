@@ -64,9 +64,9 @@ OPTIONS:
    --playlist NAME, --pl NAME  Search playlists, NAME, on Spotify
 
 NAME:
-   Spotcon vol - Options for changing volume of playback
+   spotcon vol - Options for changing volume of playback
 USAGE:
-   Spotcon vol command [command options] [arguments...]
+   spotcon vol command [command options] [arguments...]
 COMMANDS:
      up    Increase volume by PERCENT or 10% if not specified
      down  Decrease volume by PERCENT or 10% if not specified
