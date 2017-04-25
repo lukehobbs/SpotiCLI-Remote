@@ -1,10 +1,10 @@
 # Spotcon
 
-Spotcon is a WIP command line interface, written in Go, that controls media playback over spotify connected devices using the [Spotify Web API](https://api.spotify.com).
+Spotcon is a WIP command line interface, written in Go, that controls media playback to Spotify connected devices using the [Spotify Web API](https://api.spotify.com).
 
 ## Usage
 
-Syntax: spotcon> command [subcommand] [--flags] [arguments...]
+Syntax: `spotcon> command [subcommand] [--flags] [arguments...]`
 
 ```
 NAME:
@@ -34,17 +34,18 @@ GLOBAL OPTIONS:
 
 ## Subcommands
 
-```
-spotcon> opt - Options for changing current playback parameters
 
+spotcon> opt 
+```
 USAGE:
    spotcon> opt [command options]  
 OPTIONS:
    --repeat value, -r value   Set playback option repeat [on, off]
    --shuffle value, -s value  Set playback option shuffle [on, off]
+```
    
-spotcon> play - Start/Resume playback
-
+spotcon> play
+```
 USAGE:
    spotcon> play [command options]   
 OPTIONS:
@@ -53,10 +54,10 @@ OPTIONS:
    --album 'NAME', --al 'NAME'   Play album with specified 'NAME' or number from search results
    --artist 'NAME', --ar 'NAME'  Play artist with specified 'NAME' or number from search results
    --plist 'NAME', --pl 'NAME'   Play playlist with specified 'NAME' or number from search results
+```
 
-
-spotcon> search - Search Spotify for artists, albums, tracks, or playlists
-
+spotcon> search 
+```
 USAGE:
    spotcon> search [command options]
 OPTIONS:
@@ -64,17 +65,18 @@ OPTIONS:
    --album, --al     Show search results for albums
    --track, --tr     Show search results for tracks
    --playlist, --pl  Show search results for playlists
+```
 
-spotcon> seek - Options for changing position in playback
-
+spotcon> seek 
+```
 USAGE:
    spotcon> seek command [command options] [arguments...]
 COMMANDS:
      ff  Fast forward playback by SECONDS or 15 seconds if not specified
      rw  Rewind playback by SECONDS or 15 seconds if not specified
-
-spotcon> vol - Options for changing volume of playback
-
+```
+spotcon> vol 
+```
 USAGE:
    spotcon> vol command [command options] [arguments...]
 COMMANDS:
