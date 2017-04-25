@@ -85,7 +85,6 @@ COMMANDS:
 
 ## Todo
 
-- ~~Move repeat and shuffle commands to be flags of options command~~
 - ~~Search should be prioritized to search user's saved library first~~
 - ~~Seek options (fast forward, rewind)~~
 - ~~Add an option to clear the console~~
