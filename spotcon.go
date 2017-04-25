@@ -8,6 +8,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/bobappleyard/readline"
 	"github.com/urfave/cli"
@@ -17,7 +18,7 @@ import (
 
 const (
 	redirectURL       = "http://localhost:8080/callback"
-	tokenDir          = "/.spoticli"
+	tokenDir          = "/.spotcon"
 	tokenFile         = tokenDir + "/token.gob"
 	longTrackTemplate = `Track:  {{.Name}}
 Artist:	{{range $index, $artist := .Artists}}{{if $index}}, {{end}}{{.Name}}{{end}}
@@ -38,6 +39,7 @@ var (
 		spotify.ScopeUserReadPrivate,
 		spotify.ScopeUserReadPlaybackState,
 		spotify.ScopeUserModifyPlaybackState,
+		spotify.ScopeUserLibraryRead,
 	)
 	state = "Spotcon"
 	ch    = make(chan *spotify.Client)
@@ -106,6 +108,15 @@ OPTIONS:
 `
 
 	app.Commands = []cli.Command{
+		{
+			Name:    "test",
+			Aliases: []string{"t"},
+			Usage:   "TESTING",
+			Action: func(c *cli.Context) error {
+
+				return nil
+			},
+		},
 		{
 			Name:    "clear",
 			Aliases: []string{"clc"},
@@ -177,23 +188,23 @@ OPTIONS:
 			Flags: []cli.Flag{
 				cli.StringFlag{
 					Name:  "device, d",
-					Usage: "Start/resume playback on specified  `NAME` or number from device list",
+					Usage: "Start/resume playback on specified  `'NAME'` or number from device list",
 				},
-				cli.BoolFlag{
+				cli.StringFlag{
 					Name:  "track, tr",
-					Usage: "Play track with specified `NAME` or number from search results",
+					Usage: "Play track with specified `'NAME'` or number from search results",
 				},
-				cli.BoolFlag{
+				cli.StringFlag{
 					Name:  "album, al",
-					Usage: "Play album with specified `NAME` or number from search results",
+					Usage: "Play album with specified `'NAME'` or number from search results",
 				},
-				cli.BoolFlag{
+				cli.StringFlag{
 					Name:  "artist, ar",
-					Usage: "Play artist with specified `NAME` or number from search results",
+					Usage: "Play artist with specified `'NAME'` or number from search results",
 				},
-				cli.BoolFlag{
+				cli.StringFlag{
 					Name:  "plist, pl",
-					Usage: "Play playlist with specified `NAME` or number from search results",
+					Usage: "Play playlist with specified `'NAME'` or number from search results",
 				},
 			},
 			Usage: "Start/Resume playback",
@@ -226,22 +237,22 @@ OPTIONS:
 			Flags: []cli.Flag{
 				cli.BoolFlag{
 					Name:  "artist, ar",
-					Usage: "Search for artist, `NAME`, on Spotify",
+					Usage: "Show search results for artists",
 				},
 				cli.BoolFlag{
 					Name:  "album, al",
-					Usage: "Search albums, `NAME`, on Spotify",
+					Usage: "Show search results for albums",
 				},
 				cli.BoolFlag{
 					Name:  "track, tr",
-					Usage: "Search tracks, `NAME`, on Spotify",
+					Usage: "Show search results for tracks",
 				},
 				cli.BoolFlag{
 					Name:  "playlist, pl",
-					Usage: "Search playlists, `NAME`, on Spotify",
+					Usage: "Show search results for playlists",
 				},
 			},
-			Usage: "Search Spotify for artists, albums, tracks, or playlists",
+			Usage: "Search for artists, albums, tracks, or playlists",
 			Action: func(c *cli.Context) error {
 				searchAction(c)
 				return nil
@@ -307,6 +318,24 @@ OPTIONS:
 	sort.Sort(cli.FlagsByName(app.Flags))
 	sort.Sort(cli.CommandsByName(app.Commands))
 
+
+	lastQuote := rune(0)
+	f := func(c rune) bool {
+		switch {
+		case c == lastQuote:
+			lastQuote = rune(0)
+			return false
+		case lastQuote != rune(0):
+			return false
+		case unicode.In(c, unicode.Quotation_Mark):
+			lastQuote = c
+			return false
+		default:
+			return unicode.IsSpace(c)
+
+		}
+	}
+
 	for {
 		line, err := readline.String("\nspotcon> ")
 		if err == io.EOF {
@@ -317,7 +346,8 @@ OPTIONS:
 			break
 		}
 		readline.AddHistory(line)
-		err = app.Run(strings.Fields("spotcon " + line))
+		c := strings.FieldsFunc("spotcon " + line, f)
+		err = app.Run(c)
 		checkErr(err)
 	}
 

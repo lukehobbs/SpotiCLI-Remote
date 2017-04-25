@@ -15,16 +15,14 @@ func startAuth() {
 	// first start an HTTP server
 	http.HandleFunc("/callback", completeAuth)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Got request for:", r.URL.String())
+		//log.Println("Got request for:", r.URL.String())
 	})
-	log.Fatal(http.ListenAndServe(":8080", nil))
-
+	go http.ListenAndServe(":8080", nil)
 	url := auth.AuthURL(state)
 	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
 
 	// wait for auth to complete
 	client := <-ch
-
 	// use the client to make calls that require authorization
 	usr, err := client.CurrentUser()
 	checkErr(err)
@@ -51,16 +49,32 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	checkErr(err)
 }
 
+func loadToken() error {
+	usr, err := user.Current()
+	checkErr(err)
+	path := usr.HomeDir + tokenFile
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	d := gob.NewDecoder(file)
+	err = d.Decode(&tok)
+	checkErr(err)
+	err = file.Close()
+	checkErr(err)
+	return err
+}
+
 func saveToken(t *oauth2.Token) error {
 	tok := &t
 	usr, err := user.Current()
 	checkErr(err)
 	if _, err = os.Stat(usr.HomeDir + tokenDir); os.IsNotExist(err) {
-		err = os.Mkdir(usr.HomeDir+tokenDir, 0600)
+		err = os.Mkdir(usr.HomeDir + tokenDir, 0700)
 		checkErr(err)
 	}
 	path := usr.HomeDir + tokenFile
-	file, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0600)
+	file, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0700)
 	if err == nil {
 		e := gob.NewEncoder(file)
 		err = e.Encode(tok)
@@ -71,17 +85,3 @@ func saveToken(t *oauth2.Token) error {
 	return err
 }
 
-func loadToken() error {
-	usr, err := user.Current()
-	checkErr(err)
-	path := usr.HomeDir + tokenFile
-	file, err := os.Open(path)
-	if err == nil {
-		d := gob.NewDecoder(file)
-		err = d.Decode(&tok)
-		checkErr(err)
-	}
-	err = file.Close()
-	checkErr(err)
-	return err
-}

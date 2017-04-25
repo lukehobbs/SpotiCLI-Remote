@@ -36,8 +36,12 @@ func currentAction(c *cli.Context) {
 	fmt.Println("Device:", getActiveDeviceName())
 	err = t.Execute(os.Stdout, tr)
 	checkErr(err)
-	fmt.Printf("Volume: %v%%\n", getVolume())
+	displayVolume()
 	displayProgress()
+}
+
+func checkSaved() spotify.URI{
+	return ""
 }
 
 func devicesAction(c *cli.Context) {
@@ -153,10 +157,9 @@ func pauseAction(c *cli.Context) {
 	checkErr(err)
 }
 
-func play(s []string, t string) {
+func play(s string, t string) {
 	client := auth.NewClient(tok)
-	a := strings.Join(s, " ")
-	if i, err := strconv.Atoi(a); err == nil {
+	if i, err := strconv.Atoi(s); err == nil {
 		switch t {
 		case track:
 			t := getInterfaceSlice(LastSearch.Tracks.Tracks)
@@ -173,7 +176,7 @@ func play(s []string, t string) {
 		}
 		return
 	}
-	u := luckySearch(a, t)
+	u := luckySearch(s, t)
 	if t == track && u != "" {
 		o := spotify.PlayOptions{URIs: []spotify.URI{u}}
 		err := client.PlayOpt(&o)
@@ -189,11 +192,24 @@ func play(s []string, t string) {
 }
 
 func playAction(c *cli.Context) {
-	if c.NumFlags() > 4 {
-		fmt.Println("ERROR: Too many flags set.")
+	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
 		checkErr(err)
 		return
+	}
+	if c.NumFlags() > 2 {
+		if !c.IsSet("device") {
+			fmt.Println("ERROR: Too many flags set.")
+			err := cli.ShowCommandHelp(c, c.Command.Name)
+			checkErr(err)
+			return
+		}
+		if c.NumFlags() > 4 {
+			fmt.Println("ERROR: Too many flags set.")
+			err := cli.ShowCommandHelp(c, c.Command.Name)
+			checkErr(err)
+			return
+		}
 	}
 	client := auth.NewClient(tok)
 	if c.IsSet("device") {
@@ -210,19 +226,19 @@ func playAction(c *cli.Context) {
 		}
 	}
 	if c.IsSet(track) {
-		play(c.Args(), track)
+		play(c.String("track"), track)
 		return
 	}
 	if c.IsSet(album) {
-		play(c.Args(), album)
+		play(c.String("album"), album)
 		return
 	}
 	if c.IsSet(artist) {
-		play(c.Args(), artist)
+		play(c.String("artist"), artist)
 		return
 	}
 	if c.IsSet(plist) {
-		play(c.Args(), plist)
+		play(c.String("plist"), plist)
 	}
 	err := client.Play()
 	checkErr(err)
@@ -379,20 +395,20 @@ func volSetAction(c *cli.Context) {
 
 func displaySearchResults(r *spotify.SearchResult) {
 	if len(r.Tracks.Tracks) > 0 {
-		displayTracks(r.Tracks.Tracks)
+		displayFullTracks(r.Tracks.Tracks)
 	}
 	if len(r.Artists.Artists) > 0 {
-		displayArtists(r.Artists.Artists)
+		displayFullArtists(r.Artists.Artists)
 	}
 	if len(r.Albums.Albums) > 0 {
-		displayAlbums(r.Albums.Albums)
+		displaySimpleAlbums(r.Albums.Albums)
 	}
 	if len(r.Playlists.Playlists) > 0 {
-		displayPlaylists(r.Playlists.Playlists)
+		displaySimplePlaylists(r.Playlists.Playlists)
 	}
 }
 
-func displayTracks(r []spotify.FullTrack) {
+func displayFullTracks(r []spotify.FullTrack) {
 	fmt.Println("Tracks: ")
 	t := template.New("shortTrackTemplate")
 	t, err := t.Parse(shortTrackTemplate)
@@ -405,7 +421,7 @@ func displayTracks(r []spotify.FullTrack) {
 	}
 }
 
-func displayArtists(r []spotify.FullArtist) {
+func displayFullArtists(r []spotify.FullArtist) {
 	fmt.Println("Artists: ")
 	for i := 0; i < 5 && i < len(r); i++ {
 		v := r[i]
@@ -413,7 +429,7 @@ func displayArtists(r []spotify.FullArtist) {
 	}
 }
 
-func displayAlbums(r []spotify.SimpleAlbum) {
+func displaySimpleAlbums(r []spotify.SimpleAlbum) {
 	client := auth.NewClient(tok)
 	fmt.Println("Albums: ")
 	t := template.New("shortAlbumTemplate")
@@ -440,7 +456,7 @@ func displayOpts() {
 	checkErr(err)
 }
 
-func displayPlaylists(r []spotify.SimplePlaylist) {
+func displaySimplePlaylists(r []spotify.SimplePlaylist) {
 	fmt.Println("Playlists: ")
 	for i := 0; i < 5 && i < len(r); i++ {
 		v := r[i]
@@ -459,6 +475,9 @@ func displayProgress() {
 
 func displayVolume() {
 	v := getVolume()
+	if v == -1 {
+		return
+	}
 	fmt.Printf("Volume:  %v%%\n", v)
 }
 
@@ -511,6 +530,26 @@ func getInterfaceSlice(r interface{}) []interface{} {
 	return nil
 }
 
+func getSavedAlbums() []spotify.SavedAlbum{
+	client := auth.NewClient(tok)
+	s, err := client.CurrentUsersAlbums()
+	checkErr(err)
+	sa := s.Albums
+	return sa
+}
+
+func getSavedArtist() {
+
+}
+
+func getSavedPlaylist() {
+
+}
+
+func getSavedTrack() {
+
+}
+
 func getURI(r interface{}) spotify.URI {
 	switch r := r.(type) {
 	case spotify.FullTrack:
@@ -536,7 +575,8 @@ func getVolume() int {
 		}
 	}
 	if a == -1 {
-		panic("Error: no devices are active, please begin playback.")
+		//fmt.Println("Error: no devices are active, please begin playback.")
+		return -1
 	}
 	return a
 }

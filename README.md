@@ -48,21 +48,21 @@ NAME:
 USAGE:
    spotcon play [command options]   
 OPTIONS:
-   --device NAME, -d NAME    Start/resume playback on specified  NAME or number from device list
-   --track NAME, --tr NAME   Play track with specified NAME or number from search results
-   --album NAME, --al NAME   Play album with specified NAME or number from search results
-   --artist NAME, --ar NAME  Play artist with specified NAME or number from search results
-   --plist NAME, --pl NAME   Play playlist with specified NAME or number from search results
+   --device 'NAME', -d 'NAME'    Start/resume playback on specified 'NAME' or number from device list
+   --track 'NAME', --tr 'NAME'   Play track with specified 'NAME' or number from search results
+   --album 'NAME', --al 'NAME'   Play album with specified 'NAME' or number from search results
+   --artist 'NAME', --ar 'NAME'  Play artist with specified 'NAME' or number from search results
+   --plist 'NAME', --pl 'NAME'   Play playlist with specified 'NAME' or number from search results
 
 NAME:
    spotcon search - Search Spotify for artists, albums, tracks, or playlists
 USAGE:
    spotcon search [command options]
 OPTIONS:
-   --artist NAME, --ar NAME    Search for artist, NAME, on Spotify
-   --album NAME, --al NAME     Search albums, NAME, on Spotify
-   --track NAME, --tr NAME     Search tracks, NAME, on Spotify
-   --playlist NAME, --pl NAME  Search playlists, NAME, on Spotify
+   --artist, --ar    Show search results for artists
+   --album, --al     Show search results for albums
+   --track, --tr     Show search results for tracks
+   --playlist, --pl  Show search results for playlists
 
 NAME:
    Spotcon seek - Options for changing position in playback
