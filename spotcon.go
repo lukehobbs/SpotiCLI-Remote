@@ -113,7 +113,6 @@ OPTIONS:
 			Aliases: []string{"t"},
 			Usage:   "TESTING",
 			Action: func(c *cli.Context) error {
-
 				return nil
 			},
 		},

@@ -40,7 +40,35 @@ func currentAction(c *cli.Context) {
 	displayProgress()
 }
 
-func checkSaved() spotify.URI{
+func checkSaved(s string, t string) spotify.URI {
+	s = strings.ToLower(s)
+	switch t {
+	case track:
+		for _, v := range getSavedTracks() {
+			fmt.Println(v.Name)
+			if s == strings.ToLower(v.Name) {
+				return v.URI
+			}
+		}
+	case album:
+		for _, v := range getSavedAlbums() {
+			if s == strings.ToLower(v.Name) {
+				return v.URI
+			}
+		}
+	case artist:
+		for _, v := range getSavedArtists() {
+			if s == strings.ToLower(v.Name) {
+				return v.URI
+			}
+		}
+	case plist:
+		for _, v := range getSavedPlaylists() {
+			if s == strings.ToLower(v.Name) {
+				return v.URI
+			}
+		}
+	}
 	return ""
 }
 
@@ -158,6 +186,7 @@ func pauseAction(c *cli.Context) {
 }
 
 func play(s string, t string) {
+	var u spotify.URI
 	client := auth.NewClient(tok)
 	if i, err := strconv.Atoi(s); err == nil {
 		switch t {
@@ -176,7 +205,11 @@ func play(s string, t string) {
 		}
 		return
 	}
-	u := luckySearch(s, t)
+	if a := checkSaved(s, t); a != "" {
+		u = a
+	} else {
+		u = luckySearch(s, t)
+	}
 	if t == track && u != "" {
 		o := spotify.PlayOptions{URIs: []spotify.URI{u}}
 		err := client.PlayOpt(&o)
@@ -393,21 +426,6 @@ func volSetAction(c *cli.Context) {
 	displayVolume()
 }
 
-func displaySearchResults(r *spotify.SearchResult) {
-	if len(r.Tracks.Tracks) > 0 {
-		displayFullTracks(r.Tracks.Tracks)
-	}
-	if len(r.Artists.Artists) > 0 {
-		displayFullArtists(r.Artists.Artists)
-	}
-	if len(r.Albums.Albums) > 0 {
-		displaySimpleAlbums(r.Albums.Albums)
-	}
-	if len(r.Playlists.Playlists) > 0 {
-		displaySimplePlaylists(r.Playlists.Playlists)
-	}
-}
-
 func displayFullTracks(r []spotify.FullTrack) {
 	fmt.Println("Tracks: ")
 	t := template.New("shortTrackTemplate")
@@ -429,6 +447,41 @@ func displayFullArtists(r []spotify.FullArtist) {
 	}
 }
 
+func displayOpts() {
+	client := auth.NewClient(tok)
+	state, err := client.PlayerState()
+	checkErr(err)
+	t := template.New("optionsTemplate")
+	t, err = t.Parse(optionsTemplate)
+	checkErr(err)
+	err = t.Execute(os.Stdout, state)
+	checkErr(err)
+}
+
+func displayProgress() {
+	client := auth.NewClient(tok)
+	p, err := client.PlayerCurrentlyPlaying()
+	checkErr(err)
+	pr := p.Progress / 1000
+	t := p.Item.Duration / 1000
+	fmt.Printf("[%d:%02d/%d:%02d]\n", pr/60, pr%60, t/60, t%60)
+}
+
+func displaySearchResults(r *spotify.SearchResult) {
+	if len(r.Tracks.Tracks) > 0 {
+		displayFullTracks(r.Tracks.Tracks)
+	}
+	if len(r.Artists.Artists) > 0 {
+		displayFullArtists(r.Artists.Artists)
+	}
+	if len(r.Albums.Albums) > 0 {
+		displaySimpleAlbums(r.Albums.Albums)
+	}
+	if len(r.Playlists.Playlists) > 0 {
+		displaySimplePlaylists(r.Playlists.Playlists)
+	}
+}
+
 func displaySimpleAlbums(r []spotify.SimpleAlbum) {
 	client := auth.NewClient(tok)
 	fmt.Println("Albums: ")
@@ -445,17 +498,6 @@ func displaySimpleAlbums(r []spotify.SimpleAlbum) {
 	}
 }
 
-func displayOpts() {
-	client := auth.NewClient(tok)
-	state, err := client.PlayerState()
-	checkErr(err)
-	t := template.New("optionsTemplate")
-	t, err = t.Parse(optionsTemplate)
-	checkErr(err)
-	err = t.Execute(os.Stdout, state)
-	checkErr(err)
-}
-
 func displaySimplePlaylists(r []spotify.SimplePlaylist) {
 	fmt.Println("Playlists: ")
 	for i := 0; i < 5 && i < len(r); i++ {
@@ -464,21 +506,12 @@ func displaySimplePlaylists(r []spotify.SimplePlaylist) {
 	}
 }
 
-func displayProgress() {
-	client := auth.NewClient(tok)
-	p, err := client.PlayerCurrentlyPlaying()
-	checkErr(err)
-	pr := p.Progress / 1000
-	t := p.Item.Duration / 1000
-	fmt.Printf("[%d:%02d/%d:%02d]\n", pr/60, pr%60, t/60, t%60)
-}
-
 func displayVolume() {
 	v := getVolume()
 	if v == -1 {
 		return
 	}
-	fmt.Printf("Volume:  %v%%\n", v)
+	fmt.Printf("Volume: %v%%\n", v)
 }
 
 func getActiveDeviceName() string {
@@ -531,23 +564,41 @@ func getInterfaceSlice(r interface{}) []interface{} {
 }
 
 func getSavedAlbums() []spotify.SavedAlbum{
+	i := 50
+	o := spotify.Options{Limit: &i}
 	client := auth.NewClient(tok)
-	s, err := client.CurrentUsersAlbums()
+	s, err := client.CurrentUsersAlbumsOpt(&o)
 	checkErr(err)
 	sa := s.Albums
 	return sa
 }
 
-func getSavedArtist() {
-
+func getSavedArtists() []spotify.FullArtist {
+	client := auth.NewClient(tok)
+	s, err := client.CurrentUsersFollowedArtistsOpt(50, "")
+	checkErr(err)
+	sa := s.Artists
+	return sa
 }
 
-func getSavedPlaylist() {
-
+func getSavedPlaylists() []spotify.SimplePlaylist {
+	i := 50
+	o := spotify.Options{Limit: &i}
+	client := auth.NewClient(tok)
+	s, err := client.CurrentUsersPlaylistsOpt(&o)
+	checkErr(err)
+	sa := s.Playlists
+	return sa
 }
 
-func getSavedTrack() {
-
+func getSavedTracks() []spotify.SavedTrack {
+	i := 50
+	o := spotify.Options{Limit: &i}
+	client := auth.NewClient(tok)
+	s, err := client.CurrentUsersTracksOpt(&o)
+	checkErr(err)
+	sa := s.Tracks
+	return sa
 }
 
 func getURI(r interface{}) spotify.URI {
