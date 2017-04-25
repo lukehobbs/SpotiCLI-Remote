@@ -145,7 +145,7 @@ Playlists:
   [4]:	"Alter Bridge" - chemistry11
   [5]:	"Bridge Anytime" - 1259523134
 
-spotcon> play --device Desktop --track 2
+spotcon> play --device 'amazon echo' --track 2
 Device: Desktop
 Track:  Under The Bridge
 Artist:	Red Hot Chili Peppers
