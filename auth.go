@@ -70,7 +70,7 @@ func saveToken(t *oauth2.Token) error {
 	usr, err := user.Current()
 	checkErr(err)
 	if _, err = os.Stat(usr.HomeDir + tokenDir); os.IsNotExist(err) {
-		err = os.Mkdir(usr.HomeDir + tokenDir, 0700)
+		err = os.Mkdir(usr.HomeDir+tokenDir, 0700)
 		checkErr(err)
 	}
 	path := usr.HomeDir + tokenFile
@@ -84,4 +84,3 @@ func saveToken(t *oauth2.Token) error {
 	checkErr(err)
 	return err
 }
-

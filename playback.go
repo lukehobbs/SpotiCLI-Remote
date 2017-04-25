@@ -349,13 +349,13 @@ func seekAction(c *cli.Context, b bool) {
 		t = t * 1000
 	}
 	if b {
-		if pr + t > d {
+		if pr+t > d {
 			t = d - pr
 		}
 		err = client.Seek(pr + t)
 		checkErr(err)
 	} else {
-		if pr - t < 0 {
+		if pr-t < 0 {
 			t = pr
 		}
 		err = client.Seek(pr - t)
@@ -563,7 +563,7 @@ func getInterfaceSlice(r interface{}) []interface{} {
 	return nil
 }
 
-func getSavedAlbums() []spotify.SavedAlbum{
+func getSavedAlbums() []spotify.SavedAlbum {
 	i := 50
 	o := spotify.Options{Limit: &i}
 	client := auth.NewClient(tok)

@@ -317,7 +317,6 @@ OPTIONS:
 	sort.Sort(cli.FlagsByName(app.Flags))
 	sort.Sort(cli.CommandsByName(app.Commands))
 
-
 	lastQuote := rune(0)
 	f := func(c rune) bool {
 		switch {
@@ -345,7 +344,7 @@ OPTIONS:
 			break
 		}
 		readline.AddHistory(line)
-		c := strings.FieldsFunc("spotcon " + line, f)
+		c := strings.FieldsFunc("spotcon "+line, f)
 		err = app.Run(c)
 		checkErr(err)
 	}
