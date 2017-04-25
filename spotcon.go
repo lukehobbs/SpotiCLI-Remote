@@ -108,14 +108,14 @@ OPTIONS:
 `
 
 	app.Commands = []cli.Command{
-		{
-			Name:    "test",
-			Aliases: []string{"t"},
-			Usage:   "TESTING",
-			Action: func(c *cli.Context) error {
-				return nil
-			},
-		},
+		//{
+		//	Name:    "test",
+		//	Aliases: []string{"t"},
+		//	Usage:   "TESTING",
+		//	Action: func(c *cli.Context) error {
+		//		return nil
+		//	},
+		//},
 		{
 			Name:    "clear",
 			Aliases: []string{"clc"},
