@@ -34,8 +34,7 @@ GLOBAL OPTIONS:
 
 ## Subcommands
 
-
-spotcon> opt 
+`spotcon> opt` 
 ```
 USAGE:
    spotcon> opt [command options]  
@@ -44,7 +43,7 @@ OPTIONS:
    --shuffle value, -s value  Set playback option shuffle [on, off]
 ```
    
-spotcon> play
+`spotcon> play`
 ```
 USAGE:
    spotcon> play [command options]   
@@ -56,7 +55,7 @@ OPTIONS:
    --plist 'NAME', --pl 'NAME'   Play playlist with specified 'NAME' or number from search results
 ```
 
-spotcon> search 
+`spotcon> search` 
 ```
 USAGE:
    spotcon> search [command options]
@@ -67,7 +66,7 @@ OPTIONS:
    --playlist, --pl  Show search results for playlists
 ```
 
-spotcon> seek 
+`spotcon> seek` 
 ```
 USAGE:
    spotcon> seek command [command options] [arguments...]
@@ -75,7 +74,7 @@ COMMANDS:
      ff  Fast forward playback by SECONDS or 15 seconds if not specified
      rw  Rewind playback by SECONDS or 15 seconds if not specified
 ```
-spotcon> vol 
+`spotcon> vol`
 ```
 USAGE:
    spotcon> vol command [command options] [arguments...]
