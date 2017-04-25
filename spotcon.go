@@ -31,6 +31,33 @@ Album:	{{.Album.Name}}
 	optionsTemplate = `Shuffle: {{if .ShuffleState}}on{{end}}{{if not .ShuffleState}}off{{end}}
 Repeat:  {{.RepeatState}}
 `
+	appHelpTemplate = `NAME:
+   {{.Name}}{{if .Usage}} - {{.Usage}}{{end}}
+USAGE:
+   {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}} {{if .VisibleFlags}}[global options]{{end}}{{if .Commands}} command [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{end}}
+DESCRIPTION:
+   {{.Description}}{{end}}{{if len .Authors}}
+AUTHOR{{with $length := len .Authors}}{{if ne 1 $length}}S{{end}}{{end}}:
+   {{range $index, $author := .Authors}}{{if $index}}
+   {{end}}{{$author}}{{end}}{{end}}{{if .VisibleCommands}}
+COMMANDS:{{range .VisibleCategories}}{{if .Name}}
+   {{.Name}}:{{end}}{{range .VisibleCommands}}
+     {{join .Names ", "}}{{"\t"}}{{.Usage}}{{end}}{{end}}{{end}}{{if .VisibleFlags}}
+GLOBAL OPTIONS:
+   {{range $index, $option := .VisibleFlags}}{{if $index}}
+   {{end}}{{$option}}{{end}}{{end}}
+`
+	commandHelpTemplate = `NAME:
+   {{.HelpName}} - {{.Usage}}
+
+USAGE:
+   {{.HelpName}}{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}{{end}}
+
+{{if .VisibleFlags}}
+OPTIONS:
+   {{range .VisibleFlags}}{{.}}
+   {{end}}{{end}}
+`
 )
 
 var (
@@ -78,59 +105,17 @@ func main() {
 	app.Usage = "Control Spotify Connect enabled devices via terminal."
 	app.UsageText = "spotcon> command [subcommand] [--flags] [arguments...]"
 
-	cli.AppHelpTemplate = `NAME:
-   {{.Name}}{{if .Usage}} - {{.Usage}}{{end}}
-USAGE:
-   {{if .UsageText}}{{.UsageText}}{{else}}{{.HelpName}} {{if .VisibleFlags}}[global options]{{end}}{{if .Commands}} command [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{end}}
-DESCRIPTION:
-   {{.Description}}{{end}}{{if len .Authors}}
-AUTHOR{{with $length := len .Authors}}{{if ne 1 $length}}S{{end}}{{end}}:
-   {{range $index, $author := .Authors}}{{if $index}}
-   {{end}}{{$author}}{{end}}{{end}}{{if .VisibleCommands}}
-COMMANDS:{{range .VisibleCategories}}{{if .Name}}
-   {{.Name}}:{{end}}{{range .VisibleCommands}}
-     {{join .Names ", "}}{{"\t"}}{{.Usage}}{{end}}{{end}}{{end}}{{if .VisibleFlags}}
-GLOBAL OPTIONS:
-   {{range $index, $option := .VisibleFlags}}{{if $index}}
-   {{end}}{{$option}}{{end}}{{end}}
-`
+	cli.AppHelpTemplate = appHelpTemplate
 
-	cli.CommandHelpTemplate = `NAME:
-   {{.HelpName}} - {{.Usage}}
-
-USAGE:
-   {{.HelpName}}{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}{{end}}
-
-{{if .VisibleFlags}}
-OPTIONS:
-   {{range .VisibleFlags}}{{.}}
-   {{end}}{{end}}
-`
+	cli.CommandHelpTemplate = commandHelpTemplate
 
 	app.Commands = []cli.Command{
-		//{
-		//	Name:    "test",
-		//	Aliases: []string{"t"},
-		//	Usage:   "TESTING",
-		//	Action: func(c *cli.Context) error {
-		//		return nil
-		//	},
-		//},
 		{
 			Name:    "clear",
 			Aliases: []string{"clc"},
 			Usage:   "Clear the command window",
 			Action: func(c *cli.Context) error {
 				clearAction(c)
-				return nil
-			},
-		},
-		{
-			Name:    "current",
-			Aliases: []string{"c"},
-			Usage:   "Display information about the current playback",
-			Action: func(c *cli.Context) error {
-				currentAction(c)
 				return nil
 			},
 		},
@@ -145,11 +130,29 @@ OPTIONS:
 			},
 		},
 		{
+			Name:    "lib",
+			Aliases: []string{"l"},
+			Usage:   "Display \"Your Music\"",
+			Action: func(c *cli.Context) error {
+
+				return nil
+			},
+		},
+		{
 			Name:    "next",
 			Aliases: []string{"n"},
 			Usage:   "Skip to the next track in queue",
 			Action: func(c *cli.Context) error {
 				skipAction(c, true)
+				return nil
+			},
+		},
+		{
+			Name:    "now",
+			Aliases: []string{"np"},
+			Usage:   "Display information about \"Now Playing\"",
+			Action: func(c *cli.Context) error {
+				nowAction(c)
 				return nil
 			},
 		},

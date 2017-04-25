@@ -22,30 +22,14 @@ const (
 	plist  = "playlist"
 )
 
-func currentAction(c *cli.Context) {
-	if c.NArg() > 0 {
-		err := cli.ShowCommandHelp(c, c.Command.Name)
-		checkErr(err)
-		return
-	}
-	tr := getCurrentTrack()
-	t := template.New("longTrackTemplate")
-	t, err := t.Parse(longTrackTemplate)
-	checkErr(err)
-
-	fmt.Println("Device:", getActiveDeviceName())
-	err = t.Execute(os.Stdout, tr)
-	checkErr(err)
-	displayVolume()
-	displayProgress()
-}
-
+// checkSaved looks for the specified string in the user's saved library
+// t is the type of s and can be any of (artist, album, playlist, track)
+// Returns the URI of s if found or "" if not found
 func checkSaved(s string, t string) spotify.URI {
 	s = strings.ToLower(s)
 	switch t {
 	case track:
 		for _, v := range getSavedTracks() {
-			fmt.Println(v.Name)
 			if s == strings.ToLower(v.Name) {
 				return v.URI
 			}
@@ -72,6 +56,8 @@ func checkSaved(s string, t string) spotify.URI {
 	return ""
 }
 
+// devicesAction is called with spotcon> devices
+// Lists the user's Spotify Connected devices
 func devicesAction(c *cli.Context) {
 	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
@@ -92,14 +78,13 @@ func devicesAction(c *cli.Context) {
 	}
 }
 
-func displayLastSearch() {
-	if LastSearch == nil {
-		fmt.Println("No previous search results found.")
-		return
-	}
-	displaySearchResults(LastSearch)
+func libAction(c *cli.Context) {
+
 }
 
+// luckySearch searches Spotify for specified string
+// t is the type of s and can be any of (artist, album, playlist, track)
+// Returns the first result matching the string specified
 func luckySearch(s string, t string) spotify.URI {
 	client := auth.NewClient(tok)
 	switch t {
@@ -144,6 +129,8 @@ func luckySearch(s string, t string) spotify.URI {
 	}
 }
 
+// optAction is called with spotcon> opt
+// Used to set options: (repeat, shuffle) to (on, off)
 func optAction(c *cli.Context) {
 	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
@@ -174,6 +161,28 @@ func optAction(c *cli.Context) {
 	displayOpts()
 }
 
+// nowAction is called with spotcon> now
+// Displays information about Now Playing
+func nowAction(c *cli.Context) {
+	if c.NArg() > 0 {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
+	tr := getCurrentTrack()
+	t := template.New("longTrackTemplate")
+	t, err := t.Parse(longTrackTemplate)
+	checkErr(err)
+
+	fmt.Println("Device:", getActiveDeviceName())
+	err = t.Execute(os.Stdout, tr)
+	checkErr(err)
+	displayVolume()
+	displayProgress()
+}
+
+// pauseAction is called with spotcon> pause
+// Pauses the current playback
 func pauseAction(c *cli.Context) {
 	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
@@ -185,6 +194,11 @@ func pauseAction(c *cli.Context) {
 	checkErr(err)
 }
 
+// play begins playback
+//      - t determines the type which is one of (artist, album, playlist, track)
+//      - if s is a number, playNum() is called to handle playback
+//      - if s is a string, the user's saved tracks are searched for matches and
+//        no matches are found, the first result from a search is played
 func play(s string, t string) {
 	var u spotify.URI
 	client := auth.NewClient(tok)
@@ -224,6 +238,8 @@ func play(s string, t string) {
 	}
 }
 
+// playAction is called with spotcon> play
+// Start/Resumes playback and handles flags
 func playAction(c *cli.Context) {
 	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
@@ -277,6 +293,8 @@ func playAction(c *cli.Context) {
 	checkErr(err)
 }
 
+// playNum plays an item from LastSearch by referencing its number
+// found with searchAction()
 func playNum(i int, t []interface{}) {
 	client := auth.NewClient(tok)
 	if len(t) == 0 {
@@ -298,6 +316,8 @@ func playNum(i int, t []interface{}) {
 	}
 }
 
+// searchAction is called with spotcon> search
+// Preforms a Spotify search with the specified flags
 func searchAction(c *cli.Context) {
 	var t int
 	client := auth.NewClient(tok)
@@ -328,6 +348,8 @@ func searchAction(c *cli.Context) {
 	displaySearchResults(LastSearch)
 }
 
+// seekAction is called with spotcon> seek
+// Seeks forwards if b is true and backwards if b is false
 func seekAction(c *cli.Context, b bool) {
 	var err error
 	t := 15 * 1000
@@ -365,6 +387,8 @@ func seekAction(c *cli.Context, b bool) {
 	displayProgress()
 }
 
+// skipAction is called with either spotcon> next or spotcon> prev
+// Playback skips forward if b is true or backwards if b is false
 func skipAction(c *cli.Context, b bool) {
 	if c.NArg() > 0 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
@@ -379,11 +403,15 @@ func skipAction(c *cli.Context, b bool) {
 		err := client.Previous()
 		checkErr(err)
 	}
+	err := client.Play()
+	checkErr(err)
 	time.Sleep(200 * time.Millisecond)
-	currentAction(c)
+	nowAction(c)
 	return
 }
 
+// volAdjustAction is called by spotcon> vol (up/down)
+// Increments volume by 10% if percent is not specified
 func volAdjustAction(c *cli.Context, b bool) {
 	p := 10
 	if c.Args().First() != "" {
@@ -410,6 +438,8 @@ func volAdjustAction(c *cli.Context, b bool) {
 	displayVolume()
 }
 
+// volSetAction is called with spotcon> vol set
+// Sets volume to a specified percent
 func volSetAction(c *cli.Context) {
 	if c.NArg() != 1 {
 		err := cli.ShowCommandHelp(c, c.Command.Name)
@@ -426,6 +456,8 @@ func volSetAction(c *cli.Context) {
 	displayVolume()
 }
 
+// displayFullTracks prints a shortTrackTemplate of each of the tracks in
+// a []spotify.FullTrack
 func displayFullTracks(r []spotify.FullTrack) {
 	fmt.Println("Tracks: ")
 	t := template.New("shortTrackTemplate")
@@ -439,6 +471,7 @@ func displayFullTracks(r []spotify.FullTrack) {
 	}
 }
 
+// func displayFullArtists
 func displayFullArtists(r []spotify.FullArtist) {
 	fmt.Println("Artists: ")
 	for i := 0; i < 5 && i < len(r); i++ {
@@ -447,6 +480,17 @@ func displayFullArtists(r []spotify.FullArtist) {
 	}
 }
 
+// func displayLastSearch prints the results of the last search query
+func displayLastSearch() {
+	if LastSearch == nil {
+		fmt.Println("No previous search results found.")
+		return
+	}
+	displaySearchResults(LastSearch)
+}
+
+// displayOpts prints the current values of shuffle and repeat
+// using the optionsTemplate
 func displayOpts() {
 	client := auth.NewClient(tok)
 	state, err := client.PlayerState()
@@ -458,6 +502,7 @@ func displayOpts() {
 	checkErr(err)
 }
 
+// displayProgress prints the current playback progress
 func displayProgress() {
 	client := auth.NewClient(tok)
 	p, err := client.PlayerCurrentlyPlaying()
@@ -467,6 +512,8 @@ func displayProgress() {
 	fmt.Printf("[%d:%02d/%d:%02d]\n", pr/60, pr%60, t/60, t%60)
 }
 
+// displaySearchResults is a helper function that calls the correct display
+// functions to print out all the search results
 func displaySearchResults(r *spotify.SearchResult) {
 	if len(r.Tracks.Tracks) > 0 {
 		displayFullTracks(r.Tracks.Tracks)
@@ -482,6 +529,8 @@ func displaySearchResults(r *spotify.SearchResult) {
 	}
 }
 
+// displaySimpleAlbums prints a shortAlbumTemplate of each of the albums
+// in a []spotify.SimpleAlbum
 func displaySimpleAlbums(r []spotify.SimpleAlbum) {
 	client := auth.NewClient(tok)
 	fmt.Println("Albums: ")
@@ -498,6 +547,8 @@ func displaySimpleAlbums(r []spotify.SimpleAlbum) {
 	}
 }
 
+// displaySimplePlaylists prints the names and owner IDs of all the playlists
+// in a []spotify.SimplePlaylist
 func displaySimplePlaylists(r []spotify.SimplePlaylist) {
 	fmt.Println("Playlists: ")
 	for i := 0; i < 5 && i < len(r); i++ {
@@ -506,6 +557,7 @@ func displaySimplePlaylists(r []spotify.SimplePlaylist) {
 	}
 }
 
+// displayVolume prints the current volume level as a percent
 func displayVolume() {
 	v := getVolume()
 	if v == -1 {
@@ -514,6 +566,8 @@ func displayVolume() {
 	fmt.Printf("Volume: %v%%\n", v)
 }
 
+// getActiveDeviceName returns the name of the actively playing device
+// Or "No devices active" if none are active
 func getActiveDeviceName() string {
 	client := auth.NewClient(tok)
 	d, err := client.PlayerDevices()
@@ -526,6 +580,7 @@ func getActiveDeviceName() string {
 	return "No devices active"
 }
 
+// getCurrentTrack returns a pointer to the currently playing track
 func getCurrentTrack() *spotify.FullTrack {
 	client := auth.NewClient(tok)
 	current, err := client.PlayerCurrentlyPlaying()
@@ -533,6 +588,9 @@ func getCurrentTrack() *spotify.FullTrack {
 	return current.Item
 }
 
+// getInterfaceSlice takes one of ([]spotify.FullTrack, []spotify.FullArtist,
+//                                 []spotify.SimpleAlbum, []spotify.SimplePlaylist)
+// and returns an interface slice version
 func getInterfaceSlice(r interface{}) []interface{} {
 	switch r := r.(type) {
 	case []spotify.FullTrack:
@@ -563,6 +621,7 @@ func getInterfaceSlice(r interface{}) []interface{} {
 	return nil
 }
 
+// getSavedAlbums returns the first 50 of the user's saved artists
 func getSavedAlbums() []spotify.SavedAlbum {
 	i := 50
 	o := spotify.Options{Limit: &i}
@@ -573,6 +632,7 @@ func getSavedAlbums() []spotify.SavedAlbum {
 	return sa
 }
 
+// getSavedArtists returns the first 50 of the user's saved artists
 func getSavedArtists() []spotify.FullArtist {
 	client := auth.NewClient(tok)
 	s, err := client.CurrentUsersFollowedArtistsOpt(50, "")
@@ -581,6 +641,7 @@ func getSavedArtists() []spotify.FullArtist {
 	return sa
 }
 
+// getSavedPlaylists returns the first 50 of the user's saved playlists
 func getSavedPlaylists() []spotify.SimplePlaylist {
 	i := 50
 	o := spotify.Options{Limit: &i}
@@ -591,6 +652,7 @@ func getSavedPlaylists() []spotify.SimplePlaylist {
 	return sa
 }
 
+// getSavedTracks returns the first 50 of the user's saved tracks
 func getSavedTracks() []spotify.SavedTrack {
 	i := 50
 	o := spotify.Options{Limit: &i}
@@ -601,6 +663,9 @@ func getSavedTracks() []spotify.SavedTrack {
 	return sa
 }
 
+// getURI accesses the URI property of the interface
+// Input must be one of [spotify.FullTrack, spotify.SimplePlaylist,
+//                       spotify.SimpleAlbum, spotify.FullArtist]
 func getURI(r interface{}) spotify.URI {
 	switch r := r.(type) {
 	case spotify.FullTrack:
@@ -615,6 +680,8 @@ func getURI(r interface{}) spotify.URI {
 	return ""
 }
 
+// getVolume retrieves the current volume level
+// Returns an integer between 0 and 100
 func getVolume() int {
 	a := -1
 	client := auth.NewClient(tok)
@@ -632,6 +699,9 @@ func getVolume() int {
 	return a
 }
 
+// setDevice transfers playback to a new device
+// Either takes the name of a device as input or the number
+// displayed from devicesAction()
 func setDevice(s string) bool {
 	client := auth.NewClient(tok)
 	d, err := client.PlayerDevices()
@@ -663,18 +733,22 @@ func setDevice(s string) bool {
 	return false
 }
 
+// setRepeat sets repeat option to one of [on, off]
 func setRepeat(s string) {
 	client := auth.NewClient(tok)
 	err := client.Repeat(s)
 	checkErr(err)
 }
 
+// setShuffle sets shuffle option to one of [on, off]
 func setShuffle(b bool) {
 	client := auth.NewClient(tok)
 	err := client.Shuffle(b)
 	checkErr(err)
 }
 
+// setVolume sets volume to a percent
+// 0 < i < 100
 func setVolume(i int) {
 	client := auth.NewClient(tok)
 	err := client.Volume(i)

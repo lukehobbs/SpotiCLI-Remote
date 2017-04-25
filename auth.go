@@ -11,6 +11,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// startAuth starts an HTTP server for the user to authenticate with Spotify
 func startAuth() {
 	// first start an HTTP server
 	http.HandleFunc("/callback", completeAuth)
@@ -29,6 +30,7 @@ func startAuth() {
 	fmt.Println("You are logged in as:", usr.ID)
 }
 
+// completeAuth gets an oauth2 token for authentication
 func completeAuth(w http.ResponseWriter, r *http.Request) {
 	var err error
 	tok, err = auth.Token(state, r)
@@ -49,6 +51,7 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	checkErr(err)
 }
 
+// loadToken reads a token from ~/.spotcon/token.gob
 func loadToken() error {
 	usr, err := user.Current()
 	checkErr(err)
@@ -65,6 +68,7 @@ func loadToken() error {
 	return err
 }
 
+// saveToken stores a token in ~/.spotcon/token.gob
 func saveToken(t *oauth2.Token) error {
 	tok := &t
 	usr, err := user.Current()
