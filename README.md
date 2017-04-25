@@ -15,9 +15,9 @@ AUTHOR:
    Luke Hobbs <lukeehobbs@gmail.com>
 COMMANDS:
      clear, clc  Clear the command window
-     current, c  Display information about the current playback
      devices, d  List available devices
      next, n     Skip to the next track in queue
+     now, np     Display information about "Now Playing"
      opt, o      Options for changing current playback parameters
      pause, pp   Pause playback
      play, p     Start/Resume playback
@@ -32,21 +32,21 @@ GLOBAL OPTIONS:
    --version, -v  print the version
 ```
 
-## Command Options
+## Subcommands
 
 ```
-NAME:
-   spotcon opt - Options for changing current playback parameters
+spotcon> opt - Options for changing current playback parameters
+
 USAGE:
-   spotcon opt [command options]  
+   spotcon> opt [command options]  
 OPTIONS:
    --repeat value, -r value   Set playback option repeat [on, off]
    --shuffle value, -s value  Set playback option shuffle [on, off]
    
-NAME:
-   spotcon play - Start/Resume playback
+spotcon> play - Start/Resume playback
+
 USAGE:
-   spotcon play [command options]   
+   spotcon> play [command options]   
 OPTIONS:
    --device 'NAME', -d 'NAME'    Start/resume playback on specified 'NAME' or number from device list
    --track 'NAME', --tr 'NAME'   Play track with specified 'NAME' or number from search results
@@ -54,30 +54,29 @@ OPTIONS:
    --artist 'NAME', --ar 'NAME'  Play artist with specified 'NAME' or number from search results
    --plist 'NAME', --pl 'NAME'   Play playlist with specified 'NAME' or number from search results
 
-NAME:
-   spotcon search - Search Spotify for artists, albums, tracks, or playlists
+
+spotcon> search - Search Spotify for artists, albums, tracks, or playlists
+
 USAGE:
-   spotcon search [command options]
+   spotcon> search [command options]
 OPTIONS:
    --artist, --ar    Show search results for artists
    --album, --al     Show search results for albums
    --track, --tr     Show search results for tracks
    --playlist, --pl  Show search results for playlists
 
-NAME:
-   Spotcon seek - Options for changing position in playback
+spotcon> seek - Options for changing position in playback
 
 USAGE:
-   Spotcon seek command [command options] [arguments...]
-
+   spotcon> seek command [command options] [arguments...]
 COMMANDS:
      ff  Fast forward playback by SECONDS or 15 seconds if not specified
      rw  Rewind playback by SECONDS or 15 seconds if not specified
 
-NAME:
-   spotcon vol - Options for changing volume of playback
+spotcon> vol - Options for changing volume of playback
+
 USAGE:
-   spotcon vol command [command options] [arguments...]
+   spotcon> vol command [command options] [arguments...]
 COMMANDS:
      up    Increase volume by PERCENT or 10% if not specified
      down  Decrease volume by PERCENT or 10% if not specified
@@ -151,6 +150,7 @@ Track:  Under The Bridge
 Artist:	Red Hot Chili Peppers
 Album:	Blood Sugar Sex Magik (Deluxe Version)
 Volume: 100%
+[0:04/4:24]
 
 spotcon> vol down 25
 Volume: 75%
