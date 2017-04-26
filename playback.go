@@ -78,10 +78,6 @@ func devicesAction(c *cli.Context) {
 	}
 }
 
-func libAction(c *cli.Context) {
-
-}
-
 // luckySearch searches Spotify for specified string
 // t is the type of s and can be any of (artist, album, playlist, track)
 // Returns the first result matching the string specified

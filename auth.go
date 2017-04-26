@@ -18,7 +18,11 @@ func startAuth() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		//log.Println("Got request for:", r.URL.String())
 	})
-	go http.ListenAndServe(":8080", nil)
+	go func() {
+		err := http.ListenAndServe(":8080", nil)
+		checkErr(err)
+	}()
+
 	url := auth.AuthURL(state)
 	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
 

@@ -58,6 +58,21 @@ OPTIONS:
    {{range .VisibleFlags}}{{.}}
    {{end}}{{end}}
 `
+	subcommandHelpTemplate = `NAME:
+   {{.HelpName}} - {{if .Description}}{{.Description}}{{else}}{{.Usage}}{{end}}
+
+USAGE:
+   {{.HelpName}} command{{if .VisibleFlags}} [command options]{{end}} {{if .ArgsUsage}}{{.ArgsUsage}}{{else}}[arguments...]{{end}}
+
+COMMANDS:{{range .VisibleCategories}}{{if .Name}}
+   {{.Name}}:{{end}}{{range .VisibleCommands}}
+     {{join .Names ", "}}{{"\t"}}{{.Usage}}{{end}}
+{{end}}{{if .VisibleFlags}}
+
+OPTIONS:
+   {{range .VisibleFlags}}{{.}}
+   {{end}}{{end}}
+`
 )
 
 var (
@@ -93,7 +108,7 @@ func init() {
 func main() {
 	app := cli.NewApp()
 	app.Name = "Spotcon"
-	app.HelpName = "spotcon"
+	app.HelpName = "spotcon>"
 	app.Version = "0.0.1"
 	app.Compiled = time.Now()
 	app.Authors = []cli.Author{
@@ -106,8 +121,8 @@ func main() {
 	app.UsageText = "spotcon> command [subcommand] [--flags] [arguments...]"
 
 	cli.AppHelpTemplate = appHelpTemplate
-
 	cli.CommandHelpTemplate = commandHelpTemplate
+	cli.SubcommandHelpTemplate = subcommandHelpTemplate
 
 	app.Commands = []cli.Command{
 		{
