@@ -149,7 +149,7 @@ func main() {
 			Aliases: []string{"l"},
 			Usage:   "Display \"Your Music\"",
 			Action: func(c *cli.Context) error {
-
+				libAction(c)
 				return nil
 			},
 		},

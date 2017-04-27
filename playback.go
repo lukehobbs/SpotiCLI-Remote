@@ -10,6 +10,8 @@ import (
 
 	"github.com/urfave/cli"
 	"github.com/zmb3/spotify"
+	"os/exec"
+	"bytes"
 )
 
 // LastSearch is the results of the last search query
@@ -23,7 +25,7 @@ const (
 )
 
 // checkSaved looks for the specified string in the user's saved library
-// t is the type of s and can be any of (artist, album, playlist, track)
+// t is the type of s and can be any of (album, playlist, track)
 // Returns the URI of s if found or "" if not found
 func checkSaved(s string, t string) spotify.URI {
 	s = strings.ToLower(s)
@@ -36,12 +38,6 @@ func checkSaved(s string, t string) spotify.URI {
 		}
 	case album:
 		for _, v := range getSavedAlbums() {
-			if s == strings.ToLower(v.Name) {
-				return v.URI
-			}
-		}
-	case artist:
-		for _, v := range getSavedArtists() {
 			if s == strings.ToLower(v.Name) {
 				return v.URI
 			}
@@ -76,6 +72,45 @@ func devicesAction(c *cli.Context) {
 			fmt.Println()
 		}
 	}
+}
+
+// TODO: Use Offset to retrieve all of the user's saved library
+// libAction is called with spotcon> lib
+// Prints the user's saved library (tracks, albums, playlists) to $PAGER
+func libAction(c *cli.Context) {
+	var b bytes.Buffer
+	cmd := exec.Command("/usr/bin/less")
+	// Tracks
+	t := getSavedTracks()
+	tt := template.New("shortTrackTemplate")
+	tt, err := tt.Parse(shortTrackTemplate)
+	checkErr(err)
+	b.WriteString("Tracks:\n")
+	for i, v := range t {
+		b.WriteString(fmt.Sprintf("  [%d]:\t", i + 1))
+		err := tt.Execute(&b, v)
+		checkErr(err)
+	}
+	// Albums
+	al := getSavedAlbums()
+	at := template.New("shortAlbumTemplate")
+	at, err = at.Parse(shortAlbumTemplate)
+	b.WriteString("Albums:\n")
+	for i, v := range al {
+		b.WriteString(fmt.Sprintf("  [%d]:\t", i + 1))
+		err := at.Execute(&b, v)
+		checkErr(err)
+	}
+	// Playlists
+	p := getSavedPlaylists()
+	b.WriteString("Playlists:\n")
+	for i, v := range p {
+		b.WriteString(fmt.Sprintf("  [%d]:\t%s - \"%s\"\n", i + 1, v.Name, v.Owner.ID))
+	}
+	cmd.Stdin = strings.NewReader(b.String())
+	cmd.Stdout = os.Stdout
+	err = cmd.Run()
+	checkErr(err)
 }
 
 // luckySearch searches Spotify for specified string
@@ -125,6 +160,26 @@ func luckySearch(s string, t string) spotify.URI {
 	}
 }
 
+// nowAction is called with spotcon> now
+// Displays information about Now Playing
+func nowAction(c *cli.Context) {
+	if c.NArg() > 0 {
+		err := cli.ShowCommandHelp(c, c.Command.Name)
+		checkErr(err)
+		return
+	}
+	tr := getCurrentTrack()
+	t := template.New("longTrackTemplate")
+	t, err := t.Parse(longTrackTemplate)
+	checkErr(err)
+
+	fmt.Println("Device:", getActiveDeviceName())
+	err = t.Execute(os.Stdout, tr)
+	checkErr(err)
+	displayVolume()
+	displayProgress()
+}
+
 // optAction is called with spotcon> opt
 // Used to set options: (repeat, shuffle) to (on, off)
 func optAction(c *cli.Context) {
@@ -155,26 +210,6 @@ func optAction(c *cli.Context) {
 	}
 	time.Sleep(200 * time.Millisecond)
 	displayOpts()
-}
-
-// nowAction is called with spotcon> now
-// Displays information about Now Playing
-func nowAction(c *cli.Context) {
-	if c.NArg() > 0 {
-		err := cli.ShowCommandHelp(c, c.Command.Name)
-		checkErr(err)
-		return
-	}
-	tr := getCurrentTrack()
-	t := template.New("longTrackTemplate")
-	t, err := t.Parse(longTrackTemplate)
-	checkErr(err)
-
-	fmt.Println("Device:", getActiveDeviceName())
-	err = t.Execute(os.Stdout, tr)
-	checkErr(err)
-	displayVolume()
-	displayProgress()
 }
 
 // pauseAction is called with spotcon> pause
@@ -234,6 +269,7 @@ func play(s string, t string) {
 	}
 }
 
+// TODO: Add ability to play (albums, playlists, tracks) from libAction()
 // playAction is called with spotcon> play
 // Start/Resumes playback and handles flags
 func playAction(c *cli.Context) {
@@ -467,7 +503,8 @@ func displayFullTracks(r []spotify.FullTrack) {
 	}
 }
 
-// func displayFullArtists
+// func displayFullArtists prints the name of each artist
+// in a []spotify.FullTrack
 func displayFullArtists(r []spotify.FullArtist) {
 	fmt.Println("Artists: ")
 	for i := 0; i < 5 && i < len(r); i++ {
@@ -625,15 +662,6 @@ func getSavedAlbums() []spotify.SavedAlbum {
 	s, err := client.CurrentUsersAlbumsOpt(&o)
 	checkErr(err)
 	sa := s.Albums
-	return sa
-}
-
-// getSavedArtists returns the first 50 of the user's saved artists
-func getSavedArtists() []spotify.FullArtist {
-	client := auth.NewClient(tok)
-	s, err := client.CurrentUsersFollowedArtistsOpt(50, "")
-	checkErr(err)
-	sa := s.Artists
 	return sa
 }
 
