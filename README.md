@@ -1,3 +1,5 @@
+[![Build Status](http://jenkins.h0bbs.com/buildStatus/icon?job=spotcon/master&build=3)](http://jenkins.h0bbs.com/job/spotcon/job/master/3/)
+
 # Spotcon
 
 Spotcon is a WIP command line interface, written in Go, that controls media playback to Spotify connected devices using the [Spotify Web API](https://api.spotify.com).
@@ -34,7 +36,7 @@ GLOBAL OPTIONS:
 
 ## Subcommands
 
-`spotcon> opt` 
+`spotcon> opt`
 ```
 USAGE:
    spotcon> opt [command options]  
@@ -42,7 +44,7 @@ OPTIONS:
    --repeat value, -r value   Set playback option repeat [on, off]
    --shuffle value, -s value  Set playback option shuffle [on, off]
 ```
-   
+
 `spotcon> play`
 ```
 USAGE:
@@ -55,7 +57,7 @@ OPTIONS:
    --plist 'NAME', --pl 'NAME'   Play playlist with specified 'NAME' or number from search results
 ```
 
-`spotcon> search` 
+`spotcon> search`
 ```
 USAGE:
    spotcon> search [command options]
@@ -66,7 +68,7 @@ OPTIONS:
    --playlist, --pl  Show search results for playlists
 ```
 
-`spotcon> seek` 
+`spotcon> seek`
 ```
 USAGE:
    spotcon> seek command [command options] [arguments...]
@@ -118,25 +120,25 @@ Devices:
   [3]: Amazon Echo (Speaker) ACTIVE
 
 spotcon> search bridge
-Tracks: 
+Tracks:
   [1]:	"Water Under the Bridge" by Adele
   [2]:	"Under The Bridge" by Red Hot Chili Peppers
   [3]:	"Water Under the Bridge" by Adele
   [4]:	"London Bridge" by Fergie
   [5]:	"Under The Bridge" by Red Hot Chili Peppers
-Artists: 
+Artists:
   [1]:	Alter Bridge
   [2]:	Bridge to Grace
   [3]:	Bridge
   [4]:	Marcus Bridge
   [5]:	The Bridge
-Albums: 
+Albums:
   [1]:	"Bridge Over Troubled Water" by Simon & Garfunkel
   [2]:	"Water Under the Bridge" by Adele
   [3]:	"One Day Remains" by Alter Bridge
   [4]:	"The Last Hero" by Alter Bridge
   [5]:	"Blackbird" by Alter Bridge
-Playlists: 
+Playlists:
   [1]:	"Alter Bridge Complete Collection" - officialalterbridge
   [2]:	"THE BRIDGE" - 1221493509
   [3]:	"bridge" - 11101296551
