@@ -8,10 +8,10 @@ import (
 	"text/template"
 	"time"
 
+	"bytes"
 	"github.com/urfave/cli"
 	"github.com/zmb3/spotify"
 	"os/exec"
-	"bytes"
 )
 
 // LastSearch is the results of the last search query
@@ -87,7 +87,7 @@ func libAction(c *cli.Context) {
 	checkErr(err)
 	b.WriteString("Tracks:\n")
 	for i, v := range t {
-		b.WriteString(fmt.Sprintf("  [%d]:\t", i + 1))
+		b.WriteString(fmt.Sprintf("  [%d]:\t", i+1))
 		err := tt.Execute(&b, v)
 		checkErr(err)
 	}
@@ -97,7 +97,7 @@ func libAction(c *cli.Context) {
 	at, err = at.Parse(shortAlbumTemplate)
 	b.WriteString("Albums:\n")
 	for i, v := range al {
-		b.WriteString(fmt.Sprintf("  [%d]:\t", i + 1))
+		b.WriteString(fmt.Sprintf("  [%d]:\t", i+1))
 		err := at.Execute(&b, v)
 		checkErr(err)
 	}
@@ -105,7 +105,7 @@ func libAction(c *cli.Context) {
 	p := getSavedPlaylists()
 	b.WriteString("Playlists:\n")
 	for i, v := range p {
-		b.WriteString(fmt.Sprintf("  [%d]:\t%s - \"%s\"\n", i + 1, v.Name, v.Owner.ID))
+		b.WriteString(fmt.Sprintf("  [%d]:\t%s - \"%s\"\n", i+1, v.Name, v.Owner.ID))
 	}
 	cmd.Stdin = strings.NewReader(b.String())
 	cmd.Stdout = os.Stdout
