@@ -16,12 +16,12 @@ node {
         echo env.GIT_MSG
       }
 
-      stage('cpc Parsing') {
+      stage('Build Stage') {
         sh "go version"
         sh "go get ./..."
         sh "go build"
       }
-      
+
     }
   }
 }
