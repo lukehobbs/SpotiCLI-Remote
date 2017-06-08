@@ -1,4 +1,5 @@
 [![Build Status](http://jenkins.h0bbs.com/buildStatus/icon?job=spotcon/master&build=3)](http://jenkins.h0bbs.com/job/spotcon/job/master/3/)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lukehobbs/spotcon)](https://goreportcard.com/report/github.com/lukehobbs/spotcon)
 
 # Spotcon
 
